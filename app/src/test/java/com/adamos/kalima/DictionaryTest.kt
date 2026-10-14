@@ -56,7 +56,23 @@ class DictionaryTest {
     fun testEnrichedDictionaryHasEveryLengthFromThreeToEight() {
         assertEquals(listOf(3, 4, 5, 6, 7, 8), Dictionary.lengths)
         Dictionary.lengths.forEach { length ->
-            assertTrue("Expected a useful word pool for length $length", Dictionary.wordsForLength(length).size >= 10)
+            val words = Dictionary.wordsForLength(length)
+            assertTrue("Expected a useful word pool for length $length", words.size >= 10)
+            // No empty words or disallowed symbols
+            words.forEach { w ->
+                assertTrue(w.isNotBlank())
+                assertTrue(w.all { ch -> ch in '\u0621'..'\u064A' || ch == '\u0629' || ch == '\u0649' })
+                assertEquals(length, Dictionary.normalize(w).length)
+            }
+        }
+    }
+
+    @Test
+    fun testNoDuplicatesPerLength() {
+        Dictionary.lengths.forEach { length ->
+            val words = Dictionary.wordsForLength(length)
+            val uniqueNormalized = words.map { Dictionary.normalize(it) }.toSet()
+            assertEquals("Duplicates found in length $length", words.size, uniqueNormalized.size)
         }
     }
 
@@ -82,4 +98,3 @@ class DictionaryTest {
         assertFalse(original.isLight())
     }
 }
-

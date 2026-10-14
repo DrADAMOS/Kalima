@@ -421,7 +421,7 @@ object Dictionary {
             val normalized = normalize(word)
             normalized.length in 3..8 && normalized.all { ch -> ch.isArabicLetter() }
         }
-        .distinct()
+        .distinctBy { normalize(it) }
 
     /** مجموعة مطبّعة للمقارنة وقبول التخمينات */
     private val knownWords: Set<String> = answerWords.map { normalize(it) }.toSet()

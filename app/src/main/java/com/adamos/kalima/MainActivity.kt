@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.view.WindowInsetsControllerCompat
+import com.adamos.kalima.data.Dictionary
 import com.adamos.kalima.data.Preferences
 import com.adamos.kalima.ui.AppRoot
 import com.adamos.kalima.ui.theme.KalimaTheme
@@ -26,6 +27,7 @@ import com.adamos.kalima.ui.theme.isLight
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Dictionary.init(applicationContext)
         // في onCreate نجعل الأشرطة شفافة فقط. لون الخلفية واتجاه الأيقونات
         // يُضبطان من KalimaApp حسب الثيم المختار.
         enableEdgeToEdge(
@@ -70,4 +72,3 @@ fun KalimaApp() {
         }
     }
 }
-

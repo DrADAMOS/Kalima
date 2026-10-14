@@ -91,6 +91,11 @@ class DictionaryTest {
     }
 
     @Test
+    fun testRemoteDictionaryWordModad() {
+        assertTrue("Expected word 'مضض' to be guessable from remote dictionary", Dictionary.isGuessable("مضض"))
+    }
+
+    @Test
     fun testCandyThemeIsLight() {
         val candy = ThemeManager.of(GameTheme.CANDY)
         assertTrue(candy.isLight())

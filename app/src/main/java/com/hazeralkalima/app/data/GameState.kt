@@ -51,7 +51,7 @@ class GameState(
     /** عدد الصفوف المعروضة حاليًا */
     val totalRows: Int get() = maxAttempts + extraRowsUsed
 
-    private val grid: MutableList<MutableList<LetterCell>> = MutableList(totalRows) {
+    private val grid: MutableList<MutableList<LetterCell>> = MutableList(maxAttempts) {
         MutableList(wordLength) { LetterCell() }
     }
 
@@ -85,7 +85,21 @@ class GameState(
         return true
     }
 
-    /** كشف حرف صحيح في موضعه (فحص الصف الحالي كاملاً لتجنب تكرار نفس الحرف المكشوف) */
+    /**
+     * حروف كشفها التلميح في الصف الحالي (بحالة EMPTY).
+     * تُستخدم لتمييزها في لوحة المفاتيح عن الحروف غير المستخدمة.
+     */
+    fun hintRevealedLetters(): Set<String> =
+        grid.flatten()
+            .filter { it.status == LetterStatus.EMPTY && it.letter.isNotEmpty() }
+            .map { Dictionary.normalize(it.letter) }
+            .toSet()
+
+    /**
+     * كشف حرف صحيح في موضعه.
+     * لا يكشف عمودًا كان صحيحًا في محاولة سابقة، ولا عمودًا ممتلئًا
+     * في الصف الحالي، ولا حرفًا مكشوفًا أصلًا في الصف الحالي.
+     */
     fun useHint(): Boolean {
         if (hintCount <= 0 || isGameOver) return false
         val limit = minOf(wordLength, targetWord.length)
@@ -143,8 +157,9 @@ class GameState(
     /** إرسال تخمين ويرجع النتيجة */
     fun submitGuess(guess: String): SubmitResult {
         if (isGameOver) return SubmitResult.AlreadyOver
-        if (guess.length != wordLength) return SubmitResult.TooShort
+        if (guess.length != wordLength) return SubmitResult.NotRightLength
         if (!Dictionary.isValidGuess(guess)) return SubmitResult.InvalidWord
+        if (!Dictionary.isGuessable(guess)) return SubmitResult.NotInDictionary
 
         // قيود الوضع الصعب
         if (hardMode && attempts.isNotEmpty()) {
@@ -154,7 +169,8 @@ class GameState(
 
             for (i in 0 until wordLength) {
                 if (lastEval[i] == 2 &&
-                    Dictionary.normalize(guess[i].toString()) != Dictionary.normalize(lastGuess[i].toString())
+                    Dictionary.normalize(guess[i].toString()) !=
+                    Dictionary.normalize(lastGuess[i].toString())
                 ) {
                     return SubmitResult.BreaksGreen
                 }
@@ -230,8 +246,14 @@ enum class SubmitResult {
     Accepted,
     Win,
     Lose,
-    TooShort,
+    /** ليس حروفًا عربية، أو طول خارج النطاق المسموح */
     InvalidWord,
+    /** عربية صحيحة لكنها ليست في قاموس اللعبة */
+    NotInDictionary,
+    /** طول التخمين لا يطابق طول الجولة */
+    NotRightLength,
+    /** أُبقيت للتوافق مع الاختبارات القديمة */
+    TooShort,
     BreaksGreen,
     MissingYellow,
     AlreadyOver,

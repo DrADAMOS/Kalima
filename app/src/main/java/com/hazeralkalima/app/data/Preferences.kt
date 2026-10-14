@@ -1,6 +1,7 @@
 package com.hazeralkalima.app.data
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.hazeralkalima.app.ui.theme.GameTheme
 import java.security.MessageDigest
@@ -184,7 +185,7 @@ class Preferences(context: Context) {
         val cleaned = pin.trim()
         if (cleaned.length < 4 || cleaned.any { !it.isDigit() }) return false
         val salt = ByteArray(16).also { SecureRandom().nextBytes(it) }
-        val hash = hashPin(cleaned, salt)
+        val hash = hashPinForTest(cleaned, salt)
         prefs.edit {
             putString(KEY_PIN_SALT, salt.joinToString(",") { it.toString() })
             putString(KEY_PIN_HASH, hash)
@@ -199,7 +200,7 @@ class Preferences(context: Context) {
         val salt = saltStr.split(",").mapNotNull { it.toByteOrNull() }.toByteArray()
         if (salt.isEmpty()) return false
         return MessageDigest.isEqual(
-            hashPin(pin.trim(), salt).toByteArray(),
+            hashPinForTest(pin.trim(), salt).toByteArray(),
             expected.toByteArray(),
         )
     }
@@ -212,19 +213,7 @@ class Preferences(context: Context) {
         }
     }
 
-    internal fun hashPinInternal(pin: String, salt: ByteArray): String = hashPin(pin, salt)
-
-    private fun hashPin(pin: String, salt: ByteArray): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        digest.update(salt)
-        // 10,000 تكرار لإبطاء التخمين بالقوة الغاشمة على PIN قصير
-        var bytes = digest.digest(pin.toByteArray(Charsets.UTF_8))
-        repeat(10_000) {
-            digest.reset()
-            bytes = digest.digest(bytes + salt)
-        }
-        return bytes.joinToString("") { "%02x".format(it) }
-    }
+    private fun hashPin(pin: String, salt: ByteArray): String = hashPinForTest(pin, salt)
 
     /** دقائق اللعب اليوم */
     fun playedMinutesToday(): Int =
@@ -268,4 +257,18 @@ class Preferences(context: Context) {
         private const val KEY_PIN_HASH = "parental_pin_hash"
         private const val KEY_PIN_SALT = "parental_pin_salt"
     }
+}
+
+/** مكشوف للاختبارات الوحدية فقط — لا يُستخدم في كود الإنتاج */
+@VisibleForTesting
+internal fun hashPinForTest(pin: String, salt: ByteArray): String {
+    val digest = MessageDigest.getInstance("SHA-256")
+    digest.update(salt)
+    // 10,000 تكرار لإبطاء التخمين بالقوة الغاشمة على PIN قصير
+    var bytes = digest.digest(pin.toByteArray(Charsets.UTF_8))
+    repeat(10_000) {
+        digest.reset()
+        bytes = digest.digest(bytes + salt)
+    }
+    return bytes.joinToString("") { "%02x".format(it) }
 }

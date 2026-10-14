@@ -29,6 +29,7 @@ captures/
 local.properties
 keystore.properties
 *.keystore
+screenshots/
 
 # IntelliJ related
 *.iml

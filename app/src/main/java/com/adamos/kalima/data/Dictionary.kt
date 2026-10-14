@@ -415,7 +415,8 @@ object Dictionary {
      * الكلمات المعروضة تحتفظ بتهجئتها العربية الأصلية (مثل مدرسة لا مدرسه).
      * التطبيع مخصص للمقارنة فقط، حتى لا تتحول التاء المربوطة في واجهة اللعبة.
      */
-    private val answerWords: List<String> = allWords
+    /** Built-in answer list is immutable so the daily challenge stays stable across dictionary updates. */
+    private val builtInAnswerWords: List<String> = allWords
         .map { it.trim() }
         .filter { word ->
             val normalized = normalize(word)
@@ -423,26 +424,54 @@ object Dictionary {
         }
         .distinctBy { normalize(it) }
 
-    /** مجموعة مطبّعة للمقارنة وقبول التخمينات */
-    private val knownWords: Set<String> = answerWords.map { normalize(it) }.toSet()
+    @Volatile
+    private var remoteAnswerWords: List<String> = emptyList()
 
-    /** كلمات الإجابات مجمَّعة حسب طولها مع الحفاظ على الإملاء الصحيح */
-    private val words: Map<Int, List<String>> = answerWords
-        .groupBy { normalize(it).length }
-        .mapValues { (_, list) -> list.sorted() }
-        .toSortedMap()
+    @Volatile
+    private var remoteGuessWords: Set<String> = emptySet()
 
     /**
-     * كل ما يُقبل كتخمين: الإجابات + قائمة التخمينات الإضافية.
-     * أوسع من knownWords بكثير، ولا يؤثر على اختيار كلمة الجولة.
+     * Apply a validated snapshot downloaded by DictionarySync.
+     * The game continues to work from built-in words when the network is unavailable.
      */
-    private val guessableWords: Set<String> =
-        (knownWords + extraGuesses.map { normalize(it.trim()) })
+    fun applyRemoteWords(answers: List<String>, guesses: List<String>) {
+        remoteAnswerWords = answers.asSequence()
+            .map { it.trim() }
+            .filter { isValidGuess(it) }
+            .distinctBy { normalize(it) }
+            .toList()
+        remoteGuessWords = guesses.asSequence()
+            .map { it.trim() }
+            .filter { isValidGuess(it) }
+            .map { normalize(it) }
+            .toSet()
+    }
+
+    /** Current answer words: built-in words plus validated remote additions. */
+    private val answerWords: List<String>
+        get() = (builtInAnswerWords + remoteAnswerWords)
+            .distinctBy { normalize(it) }
+
+    /** Normalized set used for guess validation. */
+    private val knownWords: Set<String>
+        get() = answerWords.map { normalize(it) }.toSet()
+
+    /** Current answer words grouped by normalized length. */
+    private val words: Map<Int, List<String>>
+        get() = answerWords
+            .groupBy { normalize(it).length }
+            .mapValues { (_, list) -> list.sorted() }
+            .toSortedMap()
+
+    /** Guess list includes built-in answers, extra guesses and online additions. */
+    private val guessableWords: Set<String>
+        get() = (knownWords + extraGuesses.map { normalize(it.trim()) } + remoteGuessWords)
             .filter { it.length in 3..8 && it.all { ch -> ch.isArabicLetter() } }
             .toSet()
 
-    /** أطوال الكلمات المتاحة كإجابات */
-    val lengths: List<Int> = words.keys.sorted()
+    /** Lengths currently available for answer words. */
+    val lengths: List<Int>
+        get() = words.keys.sorted()
 
     private val blockedWords = setOf(
         "حرب", "دم", "موت", "سجن", "قتل", "ضرب", "جرح",
@@ -495,9 +524,19 @@ object Dictionary {
      * يعطي نفس الكلمة لكل اللاعبين في نفس اليوم.
      */
     fun dailyWord(length: Int, dateKey: String, onlySafe: Boolean = false): String {
-        val pool = poolFor(length, onlySafe)
+        // Keep the daily answer deterministic across devices even as online words are added.
+        val pool = builtInPoolFor(length, onlySafe)
         val seed = dateKey.hashCode() + length * 31
         return pool[Random(seed).nextInt(pool.size)]
+    }
+
+    private fun builtInPoolFor(length: Int, onlySafe: Boolean): List<String> {
+        val base = builtInAnswerWords
+            .filter { normalize(it).length == length }
+            .sorted()
+        require(base.isNotEmpty()) { "لا توجد كلمات مدمجة بطول $length" }
+        val filtered = if (onlySafe) base.filter { isSafe(it) } else base
+        return filtered.ifEmpty { base }
     }
 
     fun dailyWordForDate(length: Int, dateKey: String, onlySafe: Boolean = false): String =

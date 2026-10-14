@@ -59,11 +59,16 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
     var ageLevel by remember { mutableStateOf(prefs.ageLevel) }
     var kidMode by remember { mutableStateOf(prefs.kidMode) }
     var safeDict by remember { mutableStateOf(prefs.safeDictionaryOnly) }
+    // يُزاد عند تغيير حالة PIN ليُعاد رسم صف الحماية فورًا
+    var pinStateVersion by remember { mutableStateOf(0) }
 
     var pinDialogMode by remember { mutableStateOf<PinDialogMode?>(null) }
     var pinError by remember { mutableStateOf<String?>(null) }
     var pinInput by remember { mutableStateOf("") }
     var pinConfirmInput by remember { mutableStateOf("") }
+
+    // يُقرأ عند كل إعادة رسم حتى يظهر التغيير بلا إعادة تشغيل الشاشة
+    val hasPin = remember(pinStateVersion) { prefs.hasParentalPin }
 
     Column(
         modifier = Modifier
@@ -171,28 +176,32 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
                 checked = kidMode,
                 colors = colors,
             ) { newChecked ->
-                if (!newChecked && kidMode && prefs.hasParentalPin) {
-                    // محاولة تعطيل وضع الطفل بينما هناك PIN محمي -> طلب التحقق
-                    pinInput = ""
-                    pinError = null
-                    pinDialogMode = PinDialogMode.VERIFY_TO_UNLOCK
-                } else if (newChecked && !kidMode && !prefs.hasParentalPin) {
-                    // تفعيل وضع الطفل لأول مرة وليس هناك PIN -> طلب ضبط PIN
-                    pinInput = ""
-                    pinConfirmInput = ""
-                    pinError = null
-                    pinDialogMode = PinDialogMode.SET_NEW
-                    kidMode = true
-                    prefs.kidMode = true
-                } else {
-                    kidMode = newChecked
-                    prefs.kidMode = newChecked
+                when {
+                    // تعطيل وضع الطفل بينما هناك PIN محمي -> طلب التحقق
+                    !newChecked && kidMode && hasPin -> {
+                        pinInput = ""
+                        pinConfirmInput = ""
+                        pinError = null
+                        pinDialogMode = PinDialogMode.VERIFY_TO_UNLOCK
+                    }
+                    // تفعيل وضع الطفل بلا PIN -> اطلب ضبطه، ولا تُفعّل شيئًا قبل نجاحه
+                    newChecked && !hasPin -> {
+                        pinInput = ""
+                        pinConfirmInput = ""
+                        pinError = null
+                        pinDialogMode = PinDialogMode.SET_NEW
+                    }
+                    // الحالة العادية
+                    else -> {
+                        kidMode = newChecked
+                        prefs.kidMode = newChecked
+                    }
                 }
             }
 
             Spacer(Modifier.height(8.dp))
 
-            // صف حالة حماية PIN
+            // صف حالة حماية PIN — يُقرأ من hasPin حتى يظهر التغيير فورًا
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -202,7 +211,7 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = if (prefs.hasParentalPin) "🔒 محمي بـ PIN" else "غير محمي — أضف PIN",
+                    text = if (hasPin) "🔒 محمي بـ PIN" else "غير محمي — أضف PIN",
                     color = colors.text,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -215,7 +224,7 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
                     pinDialogMode = PinDialogMode.SET_NEW
                 }) {
                     Text(
-                        text = if (prefs.hasParentalPin) "تغيير" else "إضافة",
+                        text = if (hasPin) "تغيير" else "إضافة",
                         color = colors.accent,
                         fontWeight = FontWeight.Bold,
                     )
@@ -309,14 +318,20 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
                 Button(onClick = {
                     when (pinDialogMode) {
                         PinDialogMode.SET_NEW -> {
-                            if (pinInput.length < 4 || pinInput.any { !it.isDigit() }) {
-                                pinError = "يجب أن يكون الـ PIN مكوناً من 4 أرقام على الأقل"
-                            } else if (pinInput != pinConfirmInput) {
-                                pinError = "الرمزين غير متطابقين"
-                            } else {
-                                prefs.setParentalPin(pinInput)
-                                pinDialogMode = null
-                                pinError = null
+                            when {
+                                pinInput.length < 4 || pinInput.any { !it.isDigit() } ->
+                                    pinError = "يجب أن يكون الـ PIN مكونًا من 4 أرقام على الأقل"
+                                pinInput != pinConfirmInput ->
+                                    pinError = "الرمزان غير متطابقين"
+                                prefs.setParentalPin(pinInput) -> {
+                                    // لا يُفعَّل وضع الطفل إلا بعد نجاح ضبط الـ PIN
+                                    kidMode = true
+                                    prefs.kidMode = true
+                                    pinStateVersion++
+                                    pinDialogMode = null
+                                    pinError = null
+                                }
+                                else -> pinError = "تعذّر حفظ الـ PIN"
                             }
                         }
                         PinDialogMode.VERIFY_TO_UNLOCK -> {

@@ -54,6 +54,18 @@ class GameStateTest {
     }
 
     @Test
+    fun testHintDoesNotDuplicateRevealedLetter() {
+        // هدف بطول 4، تلميحان متتاليان يجب ألا يكشفا نفس الحرف في عمودين
+        val target = Dictionary.randomWord(4)
+        val game = GameState(GameMode.RANDOM, 4, target, hintCount = 2)
+        game.useHint()
+        game.useHint()
+        val rowCells = game.rowsSnapshot()[game.currentAttempt]
+        val letters = rowCells.map { it.letter }.filter { it.isNotEmpty() }
+        assertEquals(letters.size, letters.toSet().size)
+    }
+
+    @Test
     fun testHardModeBlocksBrokenGreen() {
         // target: "بيت"
         val game = GameState(GameMode.RANDOM, 3, "بيت", hardMode = true)
@@ -66,8 +78,8 @@ class GameStateTest {
     fun testHardModeRequiresYellowLetters() {
         // target: "علم"
         val game = GameState(GameMode.RANDOM, 3, "علم", hardMode = true)
-        game.submitGuess("لمع") // 'ل', 'م', 'ع' are present (yellow/green)
-        val res = game.submitGuess("باب") // missing yellow letters
+        game.submitGuess("عمل") // 'ع' and 'ل' are green, 'م' is yellow
+        val res = game.submitGuess("عدل") // keeps green 'ع' and 'ل', but misses yellow 'م'
         assertEquals(SubmitResult.MissingYellow, res)
     }
 

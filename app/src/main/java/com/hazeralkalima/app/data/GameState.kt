@@ -85,7 +85,7 @@ class GameState(
         return true
     }
 
-    /** كشف حرف صحيح في موضعه (مع تجنب الأعمدة الممتلئة أو التي كُشفت مسبقًا) */
+    /** كشف حرف صحيح في موضعه (فحص الصف الحالي كاملاً لتجنب تكرار نفس الحرف المكشوف) */
     fun useHint(): Boolean {
         if (hintCount <= 0 || isGameOver) return false
         val limit = minOf(wordLength, targetWord.length)
@@ -95,7 +95,7 @@ class GameState(
             }
             val cell = grid.getOrNull(currentAttempt)?.getOrNull(c)
             val isFilledInCurrentRow = cell != null && cell.letter.isNotEmpty()
-            val isSameLetterRevealedEmpty = (0 until currentColumn).any {
+            val isSameLetterRevealedEmpty = (0 until wordLength).any {
                 grid.getOrNull(currentAttempt)?.getOrNull(it)?.letter == targetWord[c].toString()
             }
             if (!doneBefore && !isFilledInCurrentRow && !isSameLetterRevealedEmpty && cell != null) {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="navy_dark">#12203A</color>
+    <color name="card_bg">#1A2C4A</color>
+    <color name="accent_blue">#3BA9F4</color>
+    <color name="accent_orange">#FFA726</color>
+</resources>

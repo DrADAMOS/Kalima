@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Kalima" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#12203A</item>
+        <item name="android:navigationBarColor">#0D1830</item>
+        <item name="android:windowBackground">#12203A</item>
+    </style>
+</resources>

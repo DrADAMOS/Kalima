@@ -1,4 +1,4 @@
-package com.hazeralkalima.app
+﻿package com.adamos.kalima
 
 import android.app.Activity
 import android.graphics.Color
@@ -17,11 +17,11 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.view.WindowInsetsControllerCompat
-import com.hazeralkalima.app.data.Preferences
-import com.hazeralkalima.app.ui.AppRoot
-import com.hazeralkalima.app.ui.theme.KalimaTheme
-import com.hazeralkalima.app.ui.theme.ThemeManager
-import com.hazeralkalima.app.ui.theme.isLight
+import com.adamos.kalima.data.Preferences
+import com.adamos.kalima.ui.AppRoot
+import com.adamos.kalima.ui.theme.KalimaTheme
+import com.adamos.kalima.ui.theme.ThemeManager
+import com.adamos.kalima.ui.theme.isLight
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,3 +70,4 @@ fun KalimaApp() {
         }
     }
 }
+

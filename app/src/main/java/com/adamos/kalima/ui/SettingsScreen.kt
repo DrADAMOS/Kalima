@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui
+﻿package com.adamos.kalima.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,9 +44,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hazeralkalima.app.data.Preferences
-import com.hazeralkalima.app.ui.theme.ThemeColors
-import com.hazeralkalima.app.ui.theme.ThemeManager
+import com.adamos.kalima.data.Preferences
+import com.adamos.kalima.ui.theme.ThemeColors
+import com.adamos.kalima.ui.theme.ThemeManager
 
 /** شاشة الإعدادات — الثيم والمستوى والرقابة الأبوية */
 @Composable
@@ -403,3 +403,4 @@ private fun ToggleRow(
 }
 
 private enum class PinDialogMode { SET_NEW, VERIFY_TO_UNLOCK }
+

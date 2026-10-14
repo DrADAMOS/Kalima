@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui.theme
+﻿package com.adamos.kalima.ui.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -32,22 +32,23 @@ object ThemeManager {
 
     private val themes: Map<GameTheme, ThemeColors> = mapOf(
 
+        // مغامرة قصصية للأطفال: سماء زرقاء، ذهب دافئ، ودرجات تشبه لوحة الكنز.
         GameTheme.ORIGINAL to ThemeColors(
-            bg = Color(0xFF12203A),
-            card = Color(0xFF1A2C4A),
-            cellEmpty = Color(0xFF1E3252),
-            cellBorder = Color(0xFF2A4060),
-            accent = Color(0xFF3BA9F4),
-            accent2 = Color(0xFFFFA726),
-            text = Color(0xFFF0F4FA),
-            textDim = Color(0xFF8899B4),
-            correct = Color(0xFF4CD07A),
-            present = Color(0xFFE8C33A),
-            absent = Color(0xFF3A4A63),
-            surface = Color(0xFF243654),
-            bgGlyphs = listOf("★", "💡", "🎲", "🧩", "أ", "ب", "ت", "ث"),
-            icon = "🎮",
-            label = "الأصلي",
+            bg = Color(0xFF123B78),
+            card = Color(0xFF174A91),
+            cellEmpty = Color(0xFF245AA0),
+            cellBorder = Color(0xFF3976B8),
+            accent = Color(0xFFFFC928),
+            accent2 = Color(0xFFFF8A1F),
+            text = Color(0xFFFFF8E8),
+            textDim = Color(0xFFCFDFF7),
+            correct = Color(0xFF2E9E58),
+            present = Color(0xFFFFD52A),
+            absent = Color(0xFF875044),
+            surface = Color(0xFF0B2D60),
+            bgGlyphs = listOf("✨", "⭐", "🏜️", "🏆", "💡", "🧩", "أ", "ب"),
+            icon = "🏜️",
+            label = "مغامرة الكلمات",
         ),
 
         GameTheme.SPACE to ThemeColors(
@@ -155,3 +156,4 @@ object Dimens {
     val cellRadius = 8.dp
     val keyRadius = 6.dp
 }
+

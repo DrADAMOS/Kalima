@@ -1,9 +1,9 @@
-package com.hazeralkalima.app.data
+﻿package com.adamos.kalima.data
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
-import com.hazeralkalima.app.ui.theme.GameTheme
+import com.adamos.kalima.ui.theme.GameTheme
 import java.security.MessageDigest
 import java.security.SecureRandom
 
@@ -272,3 +272,4 @@ internal fun hashPinForTest(pin: String, salt: ByteArray): String {
     }
     return bytes.joinToString("") { "%02x".format(it) }
 }
+

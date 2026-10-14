@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui.components
+﻿package com.adamos.kalima.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,9 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hazeralkalima.app.data.LetterCell
-import com.hazeralkalima.app.data.LetterStatus
-import com.hazeralkalima.app.ui.theme.ThemeColors
+import com.adamos.kalima.data.LetterCell
+import com.adamos.kalima.data.LetterStatus
+import com.adamos.kalima.ui.theme.ThemeColors
 
 /**
  * شبكة الكلمات — صفوف وأعمدة متمركزة ديناميكياً بحسب طول الكلمة وأبعاد الشاشة.
@@ -147,3 +147,4 @@ private fun WordCell(
         }
     }
 }
+

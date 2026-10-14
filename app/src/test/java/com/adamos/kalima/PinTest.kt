@@ -1,6 +1,6 @@
-package com.hazeralkalima.app
+﻿package com.adamos.kalima
 
-import com.hazeralkalima.app.data.hashPinForTest
+import com.adamos.kalima.data.hashPinForTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
@@ -36,3 +36,4 @@ class PinTest {
         assertNotEquals(hash1, hash2)
     }
 }
+

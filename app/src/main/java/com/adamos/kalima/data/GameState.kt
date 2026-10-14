@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.data
+﻿package com.adamos.kalima.data
 
 /** حالة كل خلية في الشبكة */
 enum class LetterStatus { EMPTY, CORRECT, PRESENT, ABSENT }
@@ -258,3 +258,4 @@ enum class SubmitResult {
     MissingYellow,
     AlreadyOver,
 }
+

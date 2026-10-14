@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.hazeralkalima.app"
+    namespace = "com.adamos.kalima"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.hazeralkalima.app"
+        applicationId = "com.adamos.kalima"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

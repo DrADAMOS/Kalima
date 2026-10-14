@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui
+﻿package com.adamos.kalima.ui
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
@@ -48,15 +48,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.hazeralkalima.app.data.Dictionary
-import com.hazeralkalima.app.data.GameMode
-import com.hazeralkalima.app.data.GameState
-import com.hazeralkalima.app.data.Preferences
-import com.hazeralkalima.app.data.SubmitResult
-import com.hazeralkalima.app.ui.components.ArabicKeyboard
-import com.hazeralkalima.app.ui.components.WordGrid
-import com.hazeralkalima.app.ui.theme.ThemeColors
-import com.hazeralkalima.app.ui.theme.ThemeManager
+import com.adamos.kalima.data.Dictionary
+import com.adamos.kalima.data.GameMode
+import com.adamos.kalima.data.GameState
+import com.adamos.kalima.data.Preferences
+import com.adamos.kalima.data.SubmitResult
+import com.adamos.kalima.ui.components.ArabicKeyboard
+import com.adamos.kalima.ui.components.WordGrid
+import com.adamos.kalima.ui.theme.ThemeColors
+import com.adamos.kalima.ui.theme.ThemeManager
 import kotlinx.coroutines.delay
 
 /** شاشة اللعب — الشبكة ولوحة المفاتيح ومنطق التخمين والنتائج */
@@ -664,3 +664,4 @@ private fun MidnightCountdown(colors: ThemeColors) {
         fontWeight = FontWeight.Bold,
     )
 }
+

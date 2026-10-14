@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui.components
+﻿package com.adamos.kalima.ui.components
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
@@ -31,9 +31,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hazeralkalima.app.data.Dictionary
-import com.hazeralkalima.app.data.LetterStatus
-import com.hazeralkalima.app.ui.theme.ThemeColors
+import com.adamos.kalima.data.Dictionary
+import com.adamos.kalima.data.LetterStatus
+import com.adamos.kalima.ui.theme.ThemeColors
 
 /** لوحة المفاتيح العربية — تخطيط لوحة المفاتيح العربية القياسي (3 صفوف × 11 مفتاحاً) */
 @Composable
@@ -249,3 +249,4 @@ private fun BackspaceActionKey(
         }
     }
 }
+

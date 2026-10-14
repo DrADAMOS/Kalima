@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui
+﻿package com.adamos.kalima.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.hazeralkalima.app.data.GameMode
-import com.hazeralkalima.app.data.Preferences
+import com.adamos.kalima.data.GameMode
+import com.adamos.kalima.data.Preferences
 
 /** الشاشات المتاحة في التطبيق */
 enum class Screen { HOME, GAME, REWARDS, LEARN, SETTINGS, LEADERBOARD, HOW_TO_PLAY }
@@ -65,3 +65,4 @@ fun AppRoot() {
         Screen.HOW_TO_PLAY -> HowToPlayScreen(onBack = handleHowToBack)
     }
 }
+

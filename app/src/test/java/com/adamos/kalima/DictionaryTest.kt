@@ -1,9 +1,9 @@
-package com.hazeralkalima.app
+﻿package com.adamos.kalima
 
-import com.hazeralkalima.app.data.Dictionary
-import com.hazeralkalima.app.ui.theme.GameTheme
-import com.hazeralkalima.app.ui.theme.ThemeManager
-import com.hazeralkalima.app.ui.theme.isLight
+import com.adamos.kalima.data.Dictionary
+import com.adamos.kalima.ui.theme.GameTheme
+import com.adamos.kalima.ui.theme.ThemeManager
+import com.adamos.kalima.ui.theme.isLight
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -46,6 +46,21 @@ class DictionaryTest {
     }
 
     @Test
+    fun testCanonicalArabicSpellingIsPreserved() {
+        assertTrue(Dictionary.wordsForLength(5).contains("مدرسة"))
+        assertFalse(Dictionary.wordsForLength(5).contains("مدرسه"))
+        assertTrue(Dictionary.isGuessable("مدرسه")) // comparison still normalizes variants
+    }
+
+    @Test
+    fun testEnrichedDictionaryHasEveryLengthFromThreeToEight() {
+        assertEquals(listOf(3, 4, 5, 6, 7, 8), Dictionary.lengths)
+        Dictionary.lengths.forEach { length ->
+            assertTrue("Expected a useful word pool for length $length", Dictionary.wordsForLength(length).size >= 10)
+        }
+    }
+
+    @Test
     fun testDailyWordConsistency() {
         val word1 = Dictionary.dailyWord(5, "2026-10-14")
         val word2 = Dictionary.dailyWord(5, "2026-10-14")
@@ -67,3 +82,4 @@ class DictionaryTest {
         assertFalse(original.isLight())
     }
 }
+

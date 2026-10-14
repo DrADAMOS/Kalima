@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui.theme
+﻿package com.adamos.kalima.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -37,3 +37,4 @@ fun KalimaTheme(
         content = content,
     )
 }
+

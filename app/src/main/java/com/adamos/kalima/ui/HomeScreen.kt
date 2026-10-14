@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui
+﻿package com.adamos.kalima.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,11 +48,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hazeralkalima.app.data.Dictionary
-import com.hazeralkalima.app.data.GameMode
-import com.hazeralkalima.app.data.Preferences
-import com.hazeralkalima.app.ui.theme.ThemeColors
-import com.hazeralkalima.app.ui.theme.ThemeManager
+import com.adamos.kalima.data.Dictionary
+import com.adamos.kalima.data.GameMode
+import com.adamos.kalima.data.Preferences
+import com.adamos.kalima.ui.theme.ThemeColors
+import com.adamos.kalima.ui.theme.ThemeManager
 
 /** الشاشة الرئيسية — اختيار الوضع والدخول للعبة */
 @Composable
@@ -118,6 +118,38 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
+
+            Spacer(Modifier.height(16.dp))
+
+            // لوحة مغامرة مرحة مستوحاة من ملصق اللعبة، من دون نصوص أو حروف زخرفية خاطئة.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(colors.surface)
+                    .border(2.dp, colors.accent.copy(alpha = 0.75f), RoundedCornerShape(22.dp))
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "رحلة الكلمات تبدأ هنا!",
+                        color = colors.accent,
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.Black,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "اكتشف مفردات عربية واجمع النجوم ⭐",
+                        color = colors.text,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                Text("🏜️", fontSize = 34.sp)
+                Text("🏆", fontSize = 30.sp)
+            }
 
             Spacer(Modifier.height(16.dp))
 
@@ -303,3 +335,4 @@ private fun ModeCard(
         }
     }
 }
+

@@ -1,10 +1,10 @@
-package com.hazeralkalima.app
+﻿package com.adamos.kalima
 
-import com.hazeralkalima.app.data.Dictionary
-import com.hazeralkalima.app.data.GameMode
-import com.hazeralkalima.app.data.GameState
-import com.hazeralkalima.app.data.LetterStatus
-import com.hazeralkalima.app.data.SubmitResult
+import com.adamos.kalima.data.Dictionary
+import com.adamos.kalima.data.GameMode
+import com.adamos.kalima.data.GameState
+import com.adamos.kalima.data.LetterStatus
+import com.adamos.kalima.data.SubmitResult
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
@@ -122,3 +122,4 @@ class GameStateTest {
         assertEquals("", letters)
     }
 }
+

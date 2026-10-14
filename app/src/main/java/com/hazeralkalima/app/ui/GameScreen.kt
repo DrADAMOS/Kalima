@@ -105,15 +105,16 @@ fun GameScreen(
     }
 
     var message by remember { mutableStateOf<String?>(null) }
+    var messageVersion by remember { mutableStateOf(0) }
     var tick by remember { mutableStateOf(0) }
     var showHelpDialog by remember { mutableStateOf(false) }
     var showResultSheet by remember { mutableStateOf(dailyFinished) }
     var unlockedBadgeName by remember(roundKey) { mutableStateOf<String?>(null) }
     var recordedInMem by remember(game) { mutableStateOf(false) }
 
-    LaunchedEffect(message) {
+    LaunchedEffect(message, messageVersion) {
         if (message != null) {
-            delay(1600)
+            delay(2600)
             message = null
         }
     }
@@ -254,6 +255,7 @@ fun GameScreen(
                         onClick = {
                             if (!game.addExtraRow()) {
                                 message = "لا توجد صفوف إضافية"
+                                messageVersion++
                             }
                             tick++
                         },
@@ -265,7 +267,10 @@ fun GameScreen(
                         enabled = game.hintCount > 0,
                         colors = colors,
                         onClick = {
-                            if (!game.useHint()) message = "لا توجد تلميحات"
+                            if (!game.useHint()) {
+                                message = "لا توجد تلميحات"
+                                messageVersion++
+                            }
                             tick++
                         },
                     )
@@ -329,18 +334,42 @@ fun GameScreen(
                 },
                 onEnter = {
                     if (game.isGameOver) return@ArabicKeyboard
-                    when (game.submitGuess(game.currentRowLetters())) {
+                    val guess = game.currentRowLetters()
+                    when (game.submitGuess(guess)) {
                         SubmitResult.Win -> {
                             message = "🎉 أحسنت!"
+                            messageVersion++
                         }
                         SubmitResult.Lose -> {
                             message = "😔 انتهت المحاولات"
+                            messageVersion++
                         }
-                        SubmitResult.TooShort -> message = "الكلمة أقصر من المطلوب"
-                        SubmitResult.InvalidWord -> message = "أدخل حروفًا عربية فقط"
-                        SubmitResult.BreaksGreen -> message = "الوضع الصعب: أبقِ الحروف الخضراء"
-                        SubmitResult.MissingYellow -> message = "الوضع الصعب: ضمّن الحروف الصفراء"
-                        else -> Unit
+                        SubmitResult.NotRightLength -> {
+                            message = "الكلمة يجب أن تكون $length حروف"
+                            messageVersion++
+                        }
+                        SubmitResult.InvalidWord -> {
+                            message = "أدخل حروفًا عربية فقط بلا أرقام أو رموز"
+                            messageVersion++
+                        }
+                        SubmitResult.TooShort -> {
+                            message = "الكلمة يجب أن تكون $length حروف"
+                            messageVersion++
+                        }
+                        SubmitResult.NotInDictionary -> {
+                            message = "«$guess» ليست في قاموس اللعبة — جرّب كلمة أخرى"
+                            messageVersion++
+                        }
+                        SubmitResult.BreaksGreen -> {
+                            message = "الوضع الصعب: أبقِ الحروف الخضراء في مواضعها"
+                            messageVersion++
+                        }
+                        SubmitResult.MissingYellow -> {
+                            message = "الوضع الصعب: ضمّن الحروف الصفراء"
+                            messageVersion++
+                        }
+                        SubmitResult.AlreadyOver -> Unit
+                        SubmitResult.Accepted -> Unit
                     }
                     tick++
                 },

@@ -38,7 +38,7 @@ class PinTest {
 
     @Test
     fun generateScreenshots() {
-        val dir = java.io.File("screenshots")
+        val dir = java.io.File("D:/Android/Projects/Kalima/screenshots")
         if (!dir.exists()) dir.mkdirs()
 
         val pngBytes = byteArrayOf(

@@ -1,5 +1,9 @@
 ﻿package com.adamos.kalima.ui
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,7 +52,11 @@ import com.adamos.kalima.data.Preferences
 import com.adamos.kalima.ui.theme.ThemeColors
 import com.adamos.kalima.ui.theme.ThemeManager
 
-/** شاشة الإعدادات — الثيم والمستوى والرقابة الأبوية */
+private const val PRIVACY_POLICY_URL = "https://github.com/DrADAMOS/Kalima/blob/main/PRIVACY.md" // رابط سياسة الخصوصية الرسمي الفعلي
+private const val PLAY_STORE_PACKAGE = "com.adamos.kalima"
+private const val PLAY_STORE_WEB_URL = "https://play.google.com/store/apps/details?id=$PLAY_STORE_PACKAGE"
+
+/** شاشة الإعدادات — الثيم والمستوى والرقابة الأبوية والروابط الاجتماعية */
 @Composable
 fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
     val context = LocalContext.current
@@ -244,18 +252,56 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
 
             Spacer(Modifier.height(22.dp))
             SectionTitle("📖 المساعدة", colors)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(colors.surface)
-                    .clickable(onClick = onHowToPlay)
-                    .padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("كيف تلعب وقواعد اللعبة", color = colors.text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                Spacer(Modifier.weight(1f))
-                Text("←", color = colors.textDim, fontSize = 16.sp)
+            SettingRow("كيف تلعب وقواعد اللعبة", colors, onHowToPlay)
+
+            Spacer(Modifier.height(22.dp))
+            SectionTitle("🌐 تفاعل ومشاركة", colors)
+
+            // 1. سياسة الخصوصية
+            SettingRow("سياسة الخصوصية", colors) {
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))
+                    context.startActivity(intent)
+                } catch (_: ActivityNotFoundException) {
+                    Toast.makeText(context, "عذراً، لا يوجد متصفح متاح لفتح سياسة الخصوصية.", Toast.LENGTH_SHORT).show()
+                } catch (_: Exception) {
+                    Toast.makeText(context, "تعذّر فتح سياسة الخصوصية.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // 2. تقييم التطبيق
+            SettingRow("تقييم التطبيق", colors) {
+                val uri = Uri.parse("market://details?id=$PLAY_STORE_PACKAGE")
+                val goToMarket = Intent(Intent.ACTION_VIEW, uri)
+                try {
+                    context.startActivity(goToMarket)
+                } catch (_: Exception) {
+                    try {
+                        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(PLAY_STORE_WEB_URL))
+                        context.startActivity(webIntent)
+                    } catch (_: Exception) {
+                        Toast.makeText(context, "صفحة التقييم ستكون متاحة فور نشر التطبيق على متجر Google Play.", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // 3. مشاركة التطبيق
+            SettingRow("مشاركة التطبيق", colors) {
+                val shareMessage = "جرّب تطبيق احزر الكلمة! لعبة عربية ممتعة لتنمية المفردات والتفكير. حمّله من هنا: $PLAY_STORE_WEB_URL"
+                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, shareMessage)
+                }
+                val chooser = Intent.createChooser(sendIntent, "مشاركة التطبيق عبر")
+                try {
+                    context.startActivity(chooser)
+                } catch (_: Exception) {
+                    Toast.makeText(context, "عذراً، تعذّرت مشاركة التطبيق.", Toast.LENGTH_SHORT).show()
+                }
             }
 
             Spacer(Modifier.height(22.dp))
@@ -269,7 +315,7 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
             ) {
                 Text("الإصدار", color = colors.text, fontSize = 14.sp)
                 Spacer(Modifier.weight(1f))
-                Text("1.0.0", color = colors.textDim, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text("1.0.0", color = colors.textDim, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
 
             Spacer(Modifier.height(40.dp))
@@ -374,11 +420,28 @@ private fun SectionTitle(text: String, colors: ThemeColors) {
 }
 
 @Composable
+private fun SettingRow(label: String, colors: ThemeColors, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(colors.surface)
+            .clickable(onClick = onClick)
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, color = colors.text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.weight(1f))
+        Text("←", color = colors.textDim, fontSize = 16.sp)
+    }
+}
+
+@Composable
 private fun ToggleRow(
     label: String,
     desc: String,
-    checked: Boolean,
     colors: ThemeColors,
+    checked: Boolean,
     onChange: (Boolean) -> Unit,
 ) {
     Row(
@@ -403,4 +466,3 @@ private fun ToggleRow(
 }
 
 private enum class PinDialogMode { SET_NEW, VERIFY_TO_UNLOCK }
-

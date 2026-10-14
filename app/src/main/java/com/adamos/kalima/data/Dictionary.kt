@@ -424,54 +424,64 @@ object Dictionary {
         }
         .distinctBy { normalize(it) }
 
-    @Volatile
-    private var remoteAnswerWords: List<String> = emptyList()
+    private data class WordSnapshot(
+        val answers: List<String>,
+        val knownWords: Set<String>,
+        val wordsByLength: Map<Int, List<String>>,
+        val guessableWords: Set<String>,
+    )
 
     @Volatile
-    private var remoteGuessWords: Set<String> = emptySet()
+    private var snapshot: WordSnapshot = buildSnapshot(emptyList(), emptySet())
 
     /**
      * Apply a validated snapshot downloaded by DictionarySync.
-     * The game continues to work from built-in words when the network is unavailable.
+     * Precomputes lookups once, rather than rebuilding large sets on every guess.
      */
+    @Synchronized
     fun applyRemoteWords(answers: List<String>, guesses: List<String>) {
-        remoteAnswerWords = answers.asSequence()
+        val cleanAnswers = answers.asSequence()
             .map { it.trim() }
             .filter { isValidGuess(it) }
             .distinctBy { normalize(it) }
             .toList()
-        remoteGuessWords = guesses.asSequence()
+        val cleanGuesses = guesses.asSequence()
             .map { it.trim() }
             .filter { isValidGuess(it) }
             .map { normalize(it) }
             .toSet()
+        snapshot = buildSnapshot(cleanAnswers, cleanGuesses)
     }
 
-    /** Current answer words: built-in words plus validated remote additions. */
-    private val answerWords: List<String>
-        get() = (builtInAnswerWords + remoteAnswerWords)
+    private fun buildSnapshot(remoteAnswers: List<String>, remoteGuesses: Set<String>): WordSnapshot {
+        val mergedAnswers = (builtInAnswerWords + remoteAnswers)
             .distinctBy { normalize(it) }
-
-    /** Normalized set used for guess validation. */
-    private val knownWords: Set<String>
-        get() = answerWords.map { normalize(it) }.toSet()
-
-    /** Current answer words grouped by normalized length. */
-    private val words: Map<Int, List<String>>
-        get() = answerWords
+        val normalizedAnswers = mergedAnswers.map { normalize(it) }.toSet()
+        val groupedAnswers = mergedAnswers
             .groupBy { normalize(it).length }
             .mapValues { (_, list) -> list.sorted() }
             .toSortedMap()
-
-    /** Guess list includes built-in answers, extra guesses and online additions. */
-    private val guessableWords: Set<String>
-        get() = (knownWords + extraGuesses.map { normalize(it.trim()) } + remoteGuessWords)
+        val guesses = (normalizedAnswers + extraGuesses.map { normalize(it.trim()) } + remoteGuesses)
             .filter { it.length in 3..8 && it.all { ch -> ch.isArabicLetter() } }
             .toSet()
+        return WordSnapshot(mergedAnswers, normalizedAnswers, groupedAnswers, guesses)
+    }
+
+    private val answerWords: List<String>
+        get() = snapshot.answers
+
+    private val knownWords: Set<String>
+        get() = snapshot.knownWords
+
+    private val words: Map<Int, List<String>>
+        get() = snapshot.wordsByLength
+
+    private val guessableWords: Set<String>
+        get() = snapshot.guessableWords
 
     /** Lengths currently available for answer words. */
     val lengths: List<Int>
-        get() = words.keys.sorted()
+        get() = snapshot.wordsByLength.keys.sorted()
 
     private val blockedWords = setOf(
         "حرب", "دم", "موت", "سجن", "قتل", "ضرب", "جرح",

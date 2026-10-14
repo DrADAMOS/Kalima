@@ -3,6 +3,8 @@ package com.hazeralkalima.app.data
 import android.content.Context
 import androidx.core.content.edit
 import com.hazeralkalima.app.ui.theme.GameTheme
+import java.security.MessageDigest
+import java.security.SecureRandom
 
 /**
  * تخزين محلي لكل إعدادات اللعبة والتقدّم — فوق SharedPreferences.
@@ -171,9 +173,58 @@ class Preferences(context: Context) {
         get() = prefs.getInt(KEY_DAILY_LIMIT, 0)
         set(value) = prefs.edit { putInt(KEY_DAILY_LIMIT, value) }
 
-    var parentalPin: String?
-        get() = prefs.getString(KEY_PIN, null)
-        set(value) = prefs.edit { putString(KEY_PIN, value) }
+    /** هل تم ضبط PIN للرقابة الأبوية؟ */
+    val hasParentalPin: Boolean get() = prefs.getString(KEY_PIN_HASH, null) != null
+
+    /**
+     * يضبط PIN جديد. يُخزَّن hash مع salt عشوائي، لا النص الصريح.
+     * يرجع false إذا كان الـ PIN أقصر من 4 أرقام.
+     */
+    fun setParentalPin(pin: String): Boolean {
+        val cleaned = pin.trim()
+        if (cleaned.length < 4 || cleaned.any { !it.isDigit() }) return false
+        val salt = ByteArray(16).also { SecureRandom().nextBytes(it) }
+        val hash = hashPin(cleaned, salt)
+        prefs.edit {
+            putString(KEY_PIN_SALT, salt.joinToString(",") { it.toString() })
+            putString(KEY_PIN_HASH, hash)
+        }
+        return true
+    }
+
+    /** يتحقق من PIN مُدخل. يقارن بزمن ثابت لتقليل تسريب التوقيت. */
+    fun verifyParentalPin(pin: String): Boolean {
+        val saltStr = prefs.getString(KEY_PIN_SALT, null) ?: return false
+        val expected = prefs.getString(KEY_PIN_HASH, null) ?: return false
+        val salt = saltStr.split(",").mapNotNull { it.toByteOrNull() }.toByteArray()
+        if (salt.isEmpty()) return false
+        return MessageDigest.isEqual(
+            hashPin(pin.trim(), salt).toByteArray(),
+            expected.toByteArray(),
+        )
+    }
+
+    /** يحذف PIN (يُستخدم عند تعطيل الرقابة الأبوية نهائيًا) */
+    fun clearParentalPin() {
+        prefs.edit {
+            remove(KEY_PIN_HASH)
+            remove(KEY_PIN_SALT)
+        }
+    }
+
+    internal fun hashPinInternal(pin: String, salt: ByteArray): String = hashPin(pin, salt)
+
+    private fun hashPin(pin: String, salt: ByteArray): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        digest.update(salt)
+        // 10,000 تكرار لإبطاء التخمين بالقوة الغاشمة على PIN قصير
+        var bytes = digest.digest(pin.toByteArray(Charsets.UTF_8))
+        repeat(10_000) {
+            digest.reset()
+            bytes = digest.digest(bytes + salt)
+        }
+        return bytes.joinToString("") { "%02x".format(it) }
+    }
 
     /** دقائق اللعب اليوم */
     fun playedMinutesToday(): Int =
@@ -214,6 +265,7 @@ class Preferences(context: Context) {
         private const val KEY_KID_MODE = "kid_mode"
         private const val KEY_SAFE_DICT = "safe_dictionary"
         private const val KEY_DAILY_LIMIT = "daily_limit_minutes"
-        private const val KEY_PIN = "parental_pin"
+        private const val KEY_PIN_HASH = "parental_pin_hash"
+        private const val KEY_PIN_SALT = "parental_pin_salt"
     }
 }

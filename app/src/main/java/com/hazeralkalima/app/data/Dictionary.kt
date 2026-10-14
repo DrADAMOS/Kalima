@@ -4,6 +4,7 @@ import kotlin.random.Random
 
 /**
  * قاموس الكلمات العربية — أطوال 3 حتى 8 حروف.
+ * الكلمات مفلترة لتكون مناسبة للعائلة، مع إمكانية التصفية الآمنة للأطفال.
  */
 object Dictionary {
 
@@ -25,17 +26,17 @@ object Dictionary {
         "نوم", "سهل", "واد", "تل", "غار", "كهف", "بئر", "سد", "جسر", "طريق",
         "درب", "زقاق", "دار", "غرفة", "سقف", "حائط", "أرض", "شباك", "سور", "سياج",
         "بستان", "كرم", "نخل", "زيتون", "تين", "عنب", "رمان", "خوخ", "تفاح", "موز",
-        "تمر", "ملح", "سكر", "عسل", "زيت", "خبز", "لبن", "جبن", "بيض", "رز",
+        "تمر", "ملح", "سكر", "عسل", "زيت", "خبز", "لبن", "جبن", "بيض", "رز", "قلع", "ربح", "رهن", "لمع",
         // 4 letters
         "قلم", "وردة", "نهار", "تراب", "حديد", "خشب", "حجر", "رمال", "طين", "أخت",
         "ابن", "بنت", "جدة", "ثعلب", "سحاب", "مطر", "ثلج", "برد", "قوس", "نحل",
         "دب", "غزال", "جمل", "حصان", "بقرة", "خروف", "ديك", "بطة", "أرنب", "فأر",
         "سنجاب", "دودة", "صرصور", "نحلة", "جراد", "بلبل", "نجمة", "كوكب", "فلك", "شهاب",
-        "سماء", "غيم", "ضباب", "ندى",
+        "سماء", "غيم", "ضباب", "ندى", "تفاح", "فتحة", "حباب",
         // 5 letters
         "مدرسة", "مكتبة", "طاولة", "كرسي", "نافذة", "حديقة", "زهرة", "شجرة", "ورقة", "ثمرة",
         "غيمة", "مدينة", "قرية", "شارع", "سوق", "مسجد", "صيدلية", "مخبز", "مطعم", "كتاب",
-        "دفتر", "مسطرة", "ممحاة", "حقيبة", "مقلمة", "سبورة", "معلم", "تلميذ", "تفاح", "بطيخ",
+        "دفتر", "مسطرة", "ممحاة", "حقيبة", "مقلمة", "سبورة", "معلم", "تلميذ", "بطيخ",
         "مانجو", "ليمون", "قميص", "بنطال", "حذاء", "جورب", "قبعة", "معطف", "فستان", "تنورة",
         "حزام", "سعيد", "حزين", "غاضب", "خائف", "متعب", "جائع", "عطشان", "مريض", "قوي",
         "أحمر", "أخضر", "أزرق", "أصفر", "أبيض", "أسود", "وردي",
@@ -44,9 +45,9 @@ object Dictionary {
         "هاتف", "تلفاز", "مذياع", "كاميرا", "طابعة", "سماعة", "شاشة", "لوحة", "مطبخ", "حمام",
         "صالة", "شرفة", "أرضية", "سلم", "مصعد", "دجاجة", "حمامة", "عصفور", "ببغاء", "نعامة",
         "بطريق", "طاووس", "صقر", "نسر", "غراب", "برتقال", "فراولة", "أناناس", "كرز", "مشمش",
-        "رمان", "كيوي", "زيتون", "لوز", "طبيب", "مهندس", "شرطي", "جندي", "نجار", "حداد",
-        "خباز", "صياد", "رياضة", "كرة", "سباحة", "قفز", "تنس", "موسيقى", "غناء", "رسم",
-        "تمثيل", "رقص", "قصة", "رواية", "مسرح", "فيلم",
+        "كيوي", "لوز", "طبيب", "مهندس", "شرطي", "جندي", "نجار", "حداد",
+        "خباز", "صياد", "رياضة", "كرة", "سباحة", "قفز",
+        "تنس", "موسيقى", "غناء", "تمثيل", "رقص", "قصة", "رواية", "مسرح", "فيلم",
         // 7 letters
         "تمساح", "زرافة", "فراشة", "خنفساء", "عقرب", "عنكبوت", "ثعبان", "سحلية", "سلحفاة", "قنديل",
         "مظلة", "ساعة", "نظارة", "مفتاح", "مصباح", "مرآة", "مكنسة", "ثلاجة", "غسالة", "مكواة",
@@ -64,11 +65,15 @@ object Dictionary {
         "قرنبيط", "زمرد", "ماسة", "لؤلؤة", "ياقوت", "فيروز", "عقيق"
     )
 
-    private val words: Map<Int, List<String>> = allWords
-        .map { it.trim() }
-        .distinct()
-        .filter { it.length in 3..8 && it.all { ch -> ch.isArabicLetter() } }
-        .groupBy { it.length }
+    private val knownWords: Set<String> =
+        allWords.map { normalize(it.trim()) }
+            .filter { it.length in 3..8 && it.all { ch -> ch.isArabicLetter() } }
+            .toSet()
+
+    private val words: Map<Int, List<String>> =
+        knownWords.groupBy { it.length }
+            .mapValues { (_, list) -> list.sorted() }
+            .toSortedMap()
 
     val lengths: List<Int> = words.keys.sorted()
 
@@ -77,40 +82,62 @@ object Dictionary {
         "ظلم", "خوف", "كره", "فناء", "عدم",
     )
 
-    fun normalize(text: String): String = text
-        .replace('أ', 'ا')
-        .replace('إ', 'ا')
-        .replace('آ', 'ا')
-        .replace('ة', 'ه')
-
-    fun isSafe(word: String): Boolean {
-        val n = normalize(word)
-        return blockedWords.none { n.contains(it) }
+    /** تطبيع الحروف: أ إ آ ← ا، ة ← ه (باستخدام buildString لتحسين الأداء) */
+    fun normalize(text: String): String = buildString(text.length) {
+        for (i in 0 until text.length) {
+            when (val c = text[i]) {
+                'أ', 'إ', 'آ' -> append('ا')
+                'ة' -> append('ه')
+                else -> append(c)
+            }
+        }
     }
 
+    /** هل الكلمة آمنة (لا تحتوي على كلمات محظورة ككلمات كاملة أو أجزاء مفصولة بمسافات) */
+    fun isSafe(word: String): Boolean {
+        val normalized = normalize(word.trim())
+        if (normalized in blockedWords) return false
+        return normalized.split(' ').none { it in blockedWords }
+    }
+
+    /** هل الكلمة معروفة في القاموس */
+    fun isKnownWord(word: String): Boolean = normalize(word.trim()) in knownWords
+
+    /**
+     * كلمة عشوائية بطول محدد.
+     * @param onlySafe تصفية الكلمات المناسبة للأطفال
+     */
     fun randomWord(length: Int, onlySafe: Boolean = false, random: Random = Random.Default): String {
         val pool = poolFor(length, onlySafe)
-        if (pool.isEmpty()) return "بيت"
         return pool[random.nextInt(pool.size)]
     }
 
+    /**
+     * كلمة اليوم — ثابتة لنفس التاريخ والطول.
+     * يعطي نفس الكلمة لكل اللاعبين في نفس اليوم.
+     */
     fun dailyWord(length: Int, dateKey: String, onlySafe: Boolean = false): String {
         val pool = poolFor(length, onlySafe)
-        if (pool.isEmpty()) return "بيت"
         val seed = dateKey.hashCode() + length * 31
         return pool[Random(seed).nextInt(pool.size)]
     }
 
+    /** كلمة الغد — تُستخدم لعدّاد ما بعد الفوز */
     fun dailyWordForDate(length: Int, dateKey: String, onlySafe: Boolean = false): String =
         dailyWord(length, dateKey, onlySafe)
 
     private fun poolFor(length: Int, onlySafe: Boolean): List<String> {
-        val base = words[length] ?: words[3] ?: listOf("بيت")
+        val base = words[length]
+            ?: throw IllegalArgumentException(
+                "لا توجد كلمات بطول $length — الأطوال المتاحة: $lengths"
+            )
         val filtered = if (onlySafe) base.filter { isSafe(it) } else base
         return filtered.ifEmpty { base }
     }
 
-    fun isValidGuess(guess: String): Boolean = guess.length in 3..8 && guess.all { it.isArabicLetter() }
+    /** هل النص تخمين صحيح معروف في القاموس وبأحرف عربية */
+    fun isValidGuess(guess: String): Boolean =
+        guess.length in 3..8 && guess.all { it.isArabicLetter() } && isKnownWord(guess)
 
     private fun Char.isArabicLetter(): Boolean =
         this in '\u0621'..'\u064A' || this == '\u0629' || this == '\u0649'

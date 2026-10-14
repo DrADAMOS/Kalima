@@ -22,10 +22,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.AllInclusive
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WbSunny
@@ -93,7 +93,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                HeaderIcon(Icons.Filled.HelpOutline, "كيف تلعب", colors, onHowToPlay)
+                HeaderIcon(Icons.AutoMirrored.Filled.HelpOutline, "كيف تلعب", colors, onHowToPlay)
                 HeaderIcon(Icons.Filled.EmojiEvents, "المتصدرون", colors, onLeaderboard)
                 HeaderIcon(Icons.Filled.School, "التعلّم", colors, onLearn)
                 HeaderIcon(Icons.Filled.Settings, "الإعدادات", colors, onSettings)

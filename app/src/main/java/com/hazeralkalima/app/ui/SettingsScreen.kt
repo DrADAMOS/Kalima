@@ -17,13 +17,18 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +40,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hazeralkalima.app.data.Preferences
@@ -52,6 +59,11 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
     var ageLevel by remember { mutableStateOf(prefs.ageLevel) }
     var kidMode by remember { mutableStateOf(prefs.kidMode) }
     var safeDict by remember { mutableStateOf(prefs.safeDictionaryOnly) }
+
+    var pinDialogMode by remember { mutableStateOf<PinDialogMode?>(null) }
+    var pinError by remember { mutableStateOf<String?>(null) }
+    var pinInput by remember { mutableStateOf("") }
+    var pinConfirmInput by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -158,9 +170,56 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
                 desc = "يخفي الإعلانات والمشتريات",
                 checked = kidMode,
                 colors = colors,
+            ) { newChecked ->
+                if (!newChecked && kidMode && prefs.hasParentalPin) {
+                    // محاولة تعطيل وضع الطفل بينما هناك PIN محمي -> طلب التحقق
+                    pinInput = ""
+                    pinError = null
+                    pinDialogMode = PinDialogMode.VERIFY_TO_UNLOCK
+                } else if (newChecked && !kidMode && !prefs.hasParentalPin) {
+                    // تفعيل وضع الطفل لأول مرة وليس هناك PIN -> طلب ضبط PIN
+                    pinInput = ""
+                    pinConfirmInput = ""
+                    pinError = null
+                    pinDialogMode = PinDialogMode.SET_NEW
+                    kidMode = true
+                    prefs.kidMode = true
+                } else {
+                    kidMode = newChecked
+                    prefs.kidMode = newChecked
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // صف حالة حماية PIN
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(colors.surface)
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                kidMode = it
-                prefs.kidMode = it
+                Text(
+                    text = if (prefs.hasParentalPin) "🔒 محمي بـ PIN" else "غير محمي — أضف PIN",
+                    color = colors.text,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = {
+                    pinInput = ""
+                    pinConfirmInput = ""
+                    pinError = null
+                    pinDialogMode = PinDialogMode.SET_NEW
+                }) {
+                    Text(
+                        text = if (prefs.hasParentalPin) "تغيير" else "إضافة",
+                        color = colors.accent,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
 
             Spacer(Modifier.height(8.dp))
@@ -207,6 +266,85 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
             Spacer(Modifier.height(40.dp))
         }
     }
+
+    // حوار إدخال وتحقق الـ PIN
+    if (pinDialogMode != null) {
+        AlertDialog(
+            onDismissRequest = {
+                pinDialogMode = null
+                pinError = null
+            },
+            title = {
+                Text(
+                    text = if (pinDialogMode == PinDialogMode.SET_NEW) "تعيين رمز PIN للرقابة الأبوية" else "أدخل رمز PIN للمتابعة",
+                    color = colors.text,
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = pinInput,
+                        onValueChange = { pinInput = it },
+                        label = { Text("رمز PIN (4 أرقام فأكثر)") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        visualTransformation = PasswordVisualTransformation(),
+                    )
+                    if (pinDialogMode == PinDialogMode.SET_NEW) {
+                        OutlinedTextField(
+                            value = pinConfirmInput,
+                            onValueChange = { pinConfirmInput = it },
+                            label = { Text("تأكيد رمز PIN") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                            visualTransformation = PasswordVisualTransformation(),
+                        )
+                    }
+                    if (pinError != null) {
+                        Text(text = pinError!!, color = Color.Red, fontSize = 12.sp)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    when (pinDialogMode) {
+                        PinDialogMode.SET_NEW -> {
+                            if (pinInput.length < 4 || pinInput.any { !it.isDigit() }) {
+                                pinError = "يجب أن يكون الـ PIN مكوناً من 4 أرقام على الأقل"
+                            } else if (pinInput != pinConfirmInput) {
+                                pinError = "الرمزين غير متطابقين"
+                            } else {
+                                prefs.setParentalPin(pinInput)
+                                pinDialogMode = null
+                                pinError = null
+                            }
+                        }
+                        PinDialogMode.VERIFY_TO_UNLOCK -> {
+                            if (prefs.verifyParentalPin(pinInput)) {
+                                kidMode = false
+                                prefs.kidMode = false
+                                pinDialogMode = null
+                                pinError = null
+                            } else {
+                                pinError = "رمز PIN غير صحيح"
+                            }
+                        }
+                        null -> {}
+                    }
+                }) {
+                    Text("تم")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    pinDialogMode = null
+                    pinError = null
+                }) {
+                    Text("إلغاء", color = colors.textDim)
+                }
+            },
+        )
+    }
 }
 
 @Composable
@@ -248,3 +386,5 @@ private fun ToggleRow(
         )
     }
 }
+
+private enum class PinDialogMode { SET_NEW, VERIFY_TO_UNLOCK }

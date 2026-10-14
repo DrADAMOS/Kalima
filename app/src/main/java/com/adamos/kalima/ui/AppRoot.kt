@@ -19,7 +19,8 @@ enum class Screen { HOME, GAME, REWARDS, LEARN, SETTINGS, LEADERBOARD, HOW_TO_PL
 fun AppRoot() {
     val context = LocalContext.current
     val prefs = remember { Preferences(context) }
-    var screen by remember { mutableStateOf(if (!prefs.howToSeen) Screen.HOW_TO_PLAY else Screen.HOME) }
+    // بدء التطبيق دائماً من الشاشة الرئيسية بدون إظهار دليل التعليمات تلقائياً
+    var screen by remember { mutableStateOf(Screen.HOME) }
     var gameMode by remember { mutableStateOf(GameMode.DAILY) }
     var gameLength by remember { mutableStateOf(5) }
 
@@ -59,10 +60,8 @@ fun AppRoot() {
         Screen.LEARN -> LearnScreen(onBack = { screen = Screen.HOME })
         Screen.SETTINGS -> SettingsScreen(
             onBack = { screen = Screen.HOME },
-            onHowToPlay = { screen = Screen.HOW_TO_PLAY },
         )
         Screen.LEADERBOARD -> LeaderboardScreen(onBack = { screen = Screen.HOME })
         Screen.HOW_TO_PLAY -> HowToPlayScreen(onBack = handleHowToBack)
     }
 }
-

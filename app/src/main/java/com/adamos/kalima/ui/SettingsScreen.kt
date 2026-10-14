@@ -58,7 +58,7 @@ private const val PLAY_STORE_WEB_URL = "https://play.google.com/store/apps/detai
 
 /** شاشة الإعدادات — الثيم والمستوى والرقابة الأبوية والروابط الاجتماعية */
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { Preferences(context) }
     val colors: ThemeColors = ThemeManager.of(prefs.gameTheme)
@@ -249,10 +249,6 @@ fun SettingsScreen(onBack: () -> Unit, onHowToPlay: () -> Unit) {
                 safeDict = it
                 prefs.safeDictionaryOnly = it
             }
-
-            Spacer(Modifier.height(22.dp))
-            SectionTitle("📖 المساعدة", colors)
-            SettingRow("كيف تلعب وقواعد اللعبة", colors, onHowToPlay)
 
             Spacer(Modifier.height(22.dp))
             SectionTitle("🌐 تفاعل ومشاركة", colors)

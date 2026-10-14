@@ -17,10 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.AllInclusive
@@ -54,7 +52,7 @@ import com.adamos.kalima.data.Preferences
 import com.adamos.kalima.ui.theme.ThemeColors
 import com.adamos.kalima.ui.theme.ThemeManager
 
-/** الشاشة الرئيسية — اختيار الوضع والدخول للعبة */
+/** الشاشة الرئيسية — اختيار الوضع والدخول للعبة (تظهر بالكامل بدون تمرير) */
 @Composable
 fun HomeScreen(
     onPlay: (GameMode, Int) -> Unit,
@@ -83,12 +81,11 @@ fun HomeScreen(
                 .statusBarsPadding()
                 .displayCutoutPadding()
                 .navigationBarsPadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(6.dp))
-
-            // شريط الأيقونات العلوي
+            // شريط الأيقونات العلوي (يتضمن زر كيف تلعب)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -99,126 +96,113 @@ fun HomeScreen(
                 HeaderIcon(Icons.Filled.Settings, "الإعدادات", colors, onSettings)
             }
 
-            Spacer(Modifier.height(16.dp))
-
             // العنوان
-            Text(
-                text = "احزر الكلمة",
-                color = colors.text,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Black,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = "خمّن الكلمة!",
-                color = colors.textDim,
-                fontSize = 14.sp,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "احزر الكلمة",
+                    color = colors.text,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = "خمّن الكلمة!",
+                    color = colors.textDim,
+                    fontSize = 13.sp,
+                    textAlign = TextAlign.Center,
+                )
+            }
 
-            Spacer(Modifier.height(16.dp))
-
-            // لوحة مغامرة مرحة مستوحاة من ملصق اللعبة، من دون نصوص أو حروف زخرفية خاطئة.
+            // لوحة ترحيبية مصغرة
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(22.dp))
+                    .clip(RoundedCornerShape(16.dp))
                     .background(colors.surface)
-                    .border(2.dp, colors.accent.copy(alpha = 0.75f), RoundedCornerShape(22.dp))
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    .border(1.5.dp, colors.accent.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "رحلة الكلمات تبدأ هنا!",
                         color = colors.accent,
-                        fontSize = 19.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Black,
                     )
-                    Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "اكتشف مفردات عربية واجمع النجوم ⭐",
+                        text = "اكتشف مفردات واجمع النجوم ⭐",
                         color = colors.text,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontSize = 11.sp,
                     )
                 }
-                Spacer(Modifier.width(10.dp))
-                Text("🏜️", fontSize = 34.sp)
-                Text("🏆", fontSize = 30.sp)
+                Text("🏆", fontSize = 24.sp)
             }
 
-            Spacer(Modifier.height(16.dp))
+            // بطاقات أوضاع اللعب
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                // تحدي اليوم
+                ModeCard(
+                    title = "تحدي اليوم",
+                    subtitle = "$totalDaily ألغاز · $dailyDone/$totalDaily مكتمل",
+                    color = colors.accent,
+                    icon = Icons.Filled.WbSunny,
+                    colors = colors,
+                    onClick = {
+                        val nextLen = (3..7).firstOrNull { !prefs.isDailyFinished(it) } ?: 5
+                        onPlay(GameMode.DAILY, nextLen)
+                    },
+                )
 
-            // تحدي اليوم
-            ModeCard(
-                title = "تحدي اليوم",
-                subtitle = "$totalDaily ألغاز · $dailyDone/$totalDaily مكتمل",
-                color = colors.accent,
-                icon = Icons.Filled.WbSunny,
-                colors = colors,
-                onClick = {
-                    val nextLen = (3..7).firstOrNull { !prefs.isDailyFinished(it) } ?: 5
-                    onPlay(GameMode.DAILY, nextLen)
-                },
-            )
+                // بلا نهاية
+                ModeCard(
+                    title = "بلا نهاية",
+                    subtitle = "واصل التخمين، وابنِ سلسلتك",
+                    color = colors.correct,
+                    icon = Icons.Filled.AllInclusive,
+                    colors = colors,
+                    onClick = { onPlay(GameMode.ENDLESS, 5) },
+                )
 
-            Spacer(Modifier.height(8.dp))
+                // عشوائي
+                ModeCard(
+                    title = "عشوائي",
+                    subtitle = "طول كلمة مفاجئ",
+                    color = colors.accent2,
+                    icon = Icons.Filled.Casino,
+                    colors = colors,
+                    onClick = { onPlay(GameMode.RANDOM, Dictionary.lengths.random()) },
+                )
 
-            // بلا نهاية
-            ModeCard(
-                title = "بلا نهاية",
-                subtitle = "واصل التخمين، وابنِ سلسلتك",
-                color = colors.correct,
-                icon = Icons.Filled.AllInclusive,
-                colors = colors,
-                onClick = { onPlay(GameMode.ENDLESS, 5) },
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            // عشوائي
-            ModeCard(
-                title = "عشوائي",
-                subtitle = "طول كلمة مفاجئ",
-                color = colors.accent2,
-                icon = Icons.Filled.Casino,
-                colors = colors,
-                onClick = { onPlay(GameMode.RANDOM, Dictionary.lengths.random()) },
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            // وضع التعلّم
-            ModeCard(
-                title = "وضع التعلّم 📚",
-                subtitle = "بطاقات وكلمات جديدة بدون ضغط",
-                color = Color(0xFF9C27B0),
-                icon = Icons.Filled.School,
-                colors = colors,
-                onClick = onLearn,
-            )
-
-            Spacer(Modifier.height(8.dp))
+                // وضع التعلّم
+                ModeCard(
+                    title = "وضع التعلّم 📚",
+                    subtitle = "بطاقات وكلمات جديدة بدون ضغط",
+                    color = Color(0xFF9C27B0),
+                    icon = Icons.Filled.School,
+                    colors = colors,
+                    onClick = onLearn,
+                )
+            }
 
             // الوضع الصعب
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(colors.card)
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("🔥", fontSize = 20.sp)
-                Spacer(Modifier.width(10.dp))
+                Text("🔥", fontSize = 16.sp)
+                Spacer(Modifier.width(8.dp))
                 Text(
                     text = "الوضع الصعب",
                     color = colors.text,
-                    fontSize = 14.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f),
                 )
@@ -232,42 +216,42 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
-
             // اختيار سريع لطول الكلمة متمركز
-            Text(
-                text = "اختيار سريع لطول الكلمة",
-                color = colors.textDim,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Spacer(Modifier.height(8.dp))
-
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Dictionary.lengths.take(8).forEach { len ->
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(colors.card)
-                            .border(2.dp, colors.accent.copy(alpha = 0.4f), CircleShape)
-                            .clickable { onPlay(GameMode.RANDOM, len) },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = "$len",
-                            color = colors.text,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
+                Text(
+                    text = "اختيار سريع لطول الكلمة",
+                    color = colors.textDim,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+                ) {
+                    Dictionary.lengths.take(8).forEach { len ->
+                        Box(
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(CircleShape)
+                                .background(colors.card)
+                                .border(1.5.dp, colors.accent.copy(alpha = 0.4f), CircleShape)
+                                .clickable { onPlay(GameMode.RANDOM, len) },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "$len",
+                                color = colors.text,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                            )
+                        }
                     }
                 }
             }
-
-            Spacer(Modifier.height(20.dp))
         }
     }
 }
@@ -287,10 +271,10 @@ private fun HeaderIcon(
             imageVector = icon,
             contentDescription = label,
             tint = colors.textDim,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(22.dp),
         )
-        Spacer(Modifier.height(2.dp))
-        Text(text = label, color = colors.textDim, fontSize = 10.sp)
+        Spacer(Modifier.height(1.dp))
+        Text(text = label, color = colors.textDim, fontSize = 9.sp)
     }
 }
 
@@ -306,33 +290,31 @@ private fun ModeCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(color.copy(alpha = 0.15f))
-            .border(1.dp, color.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .border(1.dp, color.copy(alpha = 0.3f), RoundedCornerShape(14.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .size(34.dp)
+                .clip(RoundedCornerShape(10.dp))
                 .background(color.copy(alpha = 0.25f)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
+            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
         }
-        Spacer(Modifier.width(14.dp))
+        Spacer(Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
                 color = colors.text,
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(Modifier.height(2.dp))
-            Text(text = subtitle, color = colors.textDim, fontSize = 12.sp)
+            Text(text = subtitle, color = colors.textDim, fontSize = 10.sp)
         }
     }
 }
-

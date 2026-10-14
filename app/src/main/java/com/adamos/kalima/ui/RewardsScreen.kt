@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui
+﻿package com.adamos.kalima.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,11 +34,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hazeralkalima.app.data.Badge
-import com.hazeralkalima.app.data.Preferences
-import com.hazeralkalima.app.data.Rewards
-import com.hazeralkalima.app.ui.theme.ThemeColors
-import com.hazeralkalima.app.ui.theme.ThemeManager
+import com.adamos.kalima.data.Badge
+import com.adamos.kalima.data.Preferences
+import com.adamos.kalima.data.Rewards
+import com.adamos.kalima.ui.theme.ThemeColors
+import com.adamos.kalima.ui.theme.ThemeManager
 
 /** شاشة المكافآت — الشارات والكائن المتطور والإحصائيات */
 @Composable
@@ -194,3 +194,4 @@ fun ScreenHeader(title: String, colors: ThemeColors, onBack: () -> Unit) {
         Text(title, color = colors.text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
     }
 }
+

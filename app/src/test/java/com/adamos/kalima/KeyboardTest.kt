@@ -1,6 +1,6 @@
-package com.hazeralkalima.app
+﻿package com.adamos.kalima
 
-import com.hazeralkalima.app.ui.components.KeyboardRows
+import com.adamos.kalima.ui.components.KeyboardRows
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -35,3 +35,4 @@ class KeyboardTest {
         assertTrue(allKeys.containsAll(required))
     }
 }
+

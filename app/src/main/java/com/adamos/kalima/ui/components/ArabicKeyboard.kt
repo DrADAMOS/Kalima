@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.ui.components
+﻿package com.adamos.kalima.ui.components
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
@@ -31,9 +31,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hazeralkalima.app.data.Dictionary
-import com.hazeralkalima.app.data.LetterStatus
-import com.hazeralkalima.app.ui.theme.ThemeColors
+import com.adamos.kalima.data.Dictionary
+import com.adamos.kalima.data.LetterStatus
+import com.adamos.kalima.ui.theme.ThemeColors
 
 /** لوحة المفاتيح العربية — تخطيط لوحة المفاتيح العربية القياسي (3 صفوف × 11 مفتاحاً) */
 @Composable
@@ -44,6 +44,7 @@ fun ArabicKeyboard(
     onEnter: () -> Unit,
     onBackspace: () -> Unit,
     enabled: Boolean = true,
+    revealedLetters: Set<String> = emptySet(),
     modifier: Modifier = Modifier,
 ) {
     val view = LocalView.current
@@ -70,6 +71,7 @@ fun ArabicKeyboard(
                     KeyButton(
                         label = letter,
                         status = usedLetters[normalized],
+                        isHintRevealed = revealedLetters.contains(normalized),
                         colors = colors,
                         height = keyHeight,
                         fontSize = fontSize,
@@ -127,6 +129,11 @@ internal val KeyboardRows: List<List<String>> = listOf(
     listOf("ذ", "ء", "ؤ", "ر", "ئ", "ى", "ة", "و", "ز", "ظ", "د"),
 )
 
+/**
+ * مفتاح حرف.
+ * isHintRevealed: الحرف كشفه التلميح في الشبكة — يُميَّز بحدود بلون التمييز
+ * حتى لا يوهم اللاعب أنه حرف غير مستخدم.
+ */
 @Composable
 private fun KeyButton(
     label: String,
@@ -134,6 +141,7 @@ private fun KeyButton(
     colors: ThemeColors,
     height: androidx.compose.ui.unit.Dp,
     fontSize: androidx.compose.ui.unit.TextUnit,
+    isHintRevealed: Boolean = false,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onClick: () -> Unit,
@@ -148,12 +156,20 @@ private fun KeyButton(
         LetterStatus.PRESENT -> Color(0xFF1A1A1A)
         else -> colors.text
     }
+    // الحدود تظهر فقط للحرف المكشوف بتلميح ولم تُسجَّل له حالة بعد
+    val showHintBorder = isHintRevealed && status == null
 
+    val shape = RoundedCornerShape(8.dp)
     Box(
         modifier = modifier
             .height(height)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(shape)
             .background(bg)
+            .then(
+                if (showHintBorder) {
+                    Modifier.border(2.dp, colors.accent, shape)
+                } else Modifier
+            )
             .clickable(enabled = enabled, onClick = onClick)
             .semantics { contentDescription = label },
         contentAlignment = Alignment.Center,
@@ -207,7 +223,6 @@ private fun BackspaceActionKey(
 ) {
     Box(
         modifier = modifier
-            .height(height)
             .clip(RoundedCornerShape(10.dp))
             .background(color.copy(alpha = 0.22f))
             .border(1.dp, color.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
@@ -234,3 +249,4 @@ private fun BackspaceActionKey(
         }
     }
 }
+

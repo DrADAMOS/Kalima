@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.data
+﻿package com.adamos.kalima.data
 
 /** شارة إنجاز */
 data class Badge(
@@ -62,3 +62,4 @@ object Rewards {
 
 /** جائزة صندوق الكنز */
 data class ChestReward(val name: String, val emoji: String)
+

@@ -1,4 +1,4 @@
-package com.hazeralkalima.app.data
+﻿package com.adamos.kalima.data
 
 /** حالة كل خلية في الشبكة */
 enum class LetterStatus { EMPTY, CORRECT, PRESENT, ABSENT }
@@ -26,6 +26,13 @@ class GameState(
     var hintCount: Int = 2,
     val hardMode: Boolean = false,
 ) {
+    init {
+        require(wordLength > 0) { "طول الكلمة يجب أن يكون أكبر من صفر" }
+        require(Dictionary.normalize(targetWord).length == wordLength) {
+            "طول الكلمة الهدف (${targetWord.length}) لا يطابق wordLength ($wordLength)"
+        }
+    }
+
     var currentAttempt: Int = 0
         private set
     var currentColumn: Int = 0
@@ -44,7 +51,7 @@ class GameState(
     /** عدد الصفوف المعروضة حاليًا */
     val totalRows: Int get() = maxAttempts + extraRowsUsed
 
-    private val grid: MutableList<MutableList<LetterCell>> = MutableList(totalRows) {
+    private val grid: MutableList<MutableList<LetterCell>> = MutableList(maxAttempts) {
         MutableList(wordLength) { LetterCell() }
     }
 
@@ -58,7 +65,7 @@ class GameState(
 
     /** إضافة حرف للصف الحالي */
     fun addLetter(letter: String) {
-        if (isGameOver || currentColumn >= wordLength) return
+        if (isGameOver || currentAttempt >= grid.size || currentColumn >= wordLength) return
         grid[currentAttempt][currentColumn] = LetterCell(letter, LetterStatus.EMPTY)
         currentColumn++
     }
@@ -78,24 +85,40 @@ class GameState(
         return true
     }
 
-    /** كشف حرف صحيح في موضعه */
+    /**
+     * حروف كشفها التلميح في الصف الحالي (بحالة EMPTY).
+     * تُستخدم لتمييزها في لوحة المفاتيح عن الحروف غير المستخدمة.
+     */
+    fun hintRevealedLetters(): Set<String> =
+        grid.flatten()
+            .filter { it.status == LetterStatus.EMPTY && it.letter.isNotEmpty() }
+            .map { Dictionary.normalize(it.letter) }
+            .toSet()
+
+    /**
+     * كشف حرف صحيح في موضعه.
+     * لا يكشف عمودًا كان صحيحًا في محاولة سابقة، ولا عمودًا ممتلئًا
+     * في الصف الحالي، ولا حرفًا مكشوفًا أصلًا في الصف الحالي.
+     */
     fun useHint(): Boolean {
         if (hintCount <= 0 || isGameOver) return false
-        var revealed = false
         val limit = minOf(wordLength, targetWord.length)
         for (c in 0 until limit) {
             val doneBefore = (0 until currentAttempt).any {
                 grid.getOrNull(it)?.getOrNull(c)?.status == LetterStatus.CORRECT
             }
             val cell = grid.getOrNull(currentAttempt)?.getOrNull(c)
-            if (!doneBefore && cell != null && cell.letter.isEmpty()) {
+            val isFilledInCurrentRow = cell != null && cell.letter.isNotEmpty()
+            val isSameLetterRevealedEmpty = (0 until wordLength).any {
+                grid.getOrNull(currentAttempt)?.getOrNull(it)?.letter == targetWord[c].toString()
+            }
+            if (!doneBefore && !isFilledInCurrentRow && !isSameLetterRevealedEmpty && cell != null) {
+                hintCount--
                 grid[currentAttempt][c] = LetterCell(targetWord[c].toString(), LetterStatus.EMPTY)
-                revealed = true
-                break
+                return true
             }
         }
-        if (revealed) hintCount--
-        return revealed
+        return false
     }
 
     /**
@@ -103,14 +126,16 @@ class GameState(
      * 2 = صحيح، 1 = موجود بمكان خاطئ، 0 = غير موجود
      */
     fun evaluate(guess: String): List<Int> {
-        val effectiveLength = minOf(wordLength, guess.length, targetWord.length)
+        require(guess.length == wordLength) {
+            "طول التخمين (${guess.length}) يجب أن يطابق طول الجولة ($wordLength)"
+        }
         val result = MutableList(wordLength) { 0 }
         val target = targetWord.map { Dictionary.normalize(it.toString()) }.toMutableList()
         val attempt = guess.map { Dictionary.normalize(it.toString()) }.toMutableList()
 
         // المرور الأول: الأخضر
-        for (i in 0 until effectiveLength) {
-            if (i < attempt.size && i < target.size && attempt[i] == target[i]) {
+        for (i in 0 until wordLength) {
+            if (attempt[i] == target[i]) {
                 result[i] = 2
                 target[i] = "#"
                 attempt[i] = "*"
@@ -118,8 +143,8 @@ class GameState(
         }
 
         // المرور الثاني: الأصفر
-        for (i in 0 until effectiveLength) {
-            if (i >= attempt.size || attempt[i] == "*") continue
+        for (i in 0 until wordLength) {
+            if (attempt[i] == "*") continue
             val idx = target.indexOf(attempt[i])
             if (idx != -1) {
                 result[i] = 1
@@ -132,24 +157,27 @@ class GameState(
     /** إرسال تخمين ويرجع النتيجة */
     fun submitGuess(guess: String): SubmitResult {
         if (isGameOver) return SubmitResult.AlreadyOver
-        if (guess.length != wordLength) return SubmitResult.TooShort
+        if (guess.length != wordLength) return SubmitResult.NotRightLength
         if (!Dictionary.isValidGuess(guess)) return SubmitResult.InvalidWord
+        if (!Dictionary.isGuessable(guess)) return SubmitResult.NotInDictionary
 
         // قيود الوضع الصعب
         if (hardMode && attempts.isNotEmpty()) {
             val lastGuess = attempts.last()
             val lastEval = evaluate(lastGuess)
+            val normalizedGuess = Dictionary.normalize(guess)
 
             for (i in 0 until wordLength) {
                 if (lastEval[i] == 2 &&
-                    Dictionary.normalize(guess[i].toString()) != Dictionary.normalize(lastGuess[i].toString())
+                    Dictionary.normalize(guess[i].toString()) !=
+                    Dictionary.normalize(lastGuess[i].toString())
                 ) {
                     return SubmitResult.BreaksGreen
                 }
             }
             for (i in 0 until wordLength) {
                 if (lastEval[i] == 1 &&
-                    !Dictionary.normalize(guess).contains(Dictionary.normalize(lastGuess[i].toString()))
+                    !normalizedGuess.contains(Dictionary.normalize(lastGuess[i].toString()))
                 ) {
                     return SubmitResult.MissingYellow
                 }
@@ -209,8 +237,8 @@ class GameState(
         return map
     }
 
-    /** كل الصفوف للعرض */
-    fun rowsSnapshot(): List<List<LetterCell>> = grid.toList()
+    /** كل الصفوف للعرض (نسخة عميقة لحماية الحالة الداخلية) */
+    fun rowsSnapshot(): List<List<LetterCell>> = grid.map { it.toList() }
 }
 
 /** نتيجة إرسال تخمين */
@@ -218,9 +246,16 @@ enum class SubmitResult {
     Accepted,
     Win,
     Lose,
-    TooShort,
+    /** ليس حروفًا عربية، أو طول خارج النطاق المسموح */
     InvalidWord,
+    /** عربية صحيحة لكنها ليست في قاموس اللعبة */
+    NotInDictionary,
+    /** طول التخمين لا يطابق طول الجولة */
+    NotRightLength,
+    /** أُبقيت للتوافق مع الاختبارات القديمة */
+    TooShort,
     BreaksGreen,
     MissingYellow,
     AlreadyOver,
 }
+

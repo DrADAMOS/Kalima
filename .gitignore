@@ -10,10 +10,26 @@
 .svn/
 *.bak
 
+# Flutter leftovers
+.atom/
+.buildlog/
+.history
+.svn/
+*.pyc
+app.*.symbols
+app.*.map.json
+
 # Gradle / Android
 .gradle/
 build/
+captures/
+.cxx/
+*.apk
+*.aab
 local.properties
+keystore.properties
+*.keystore
+screenshots/
 
 # IntelliJ related
 *.iml
@@ -26,9 +42,3 @@ local.properties
 
 # Android related
 *.jks
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json

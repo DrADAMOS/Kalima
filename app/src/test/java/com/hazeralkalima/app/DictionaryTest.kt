@@ -54,7 +54,8 @@ class DictionaryTest {
 
     @Test
     fun testIsValidGuess() {
-        assertFalse(Dictionary.isValidGuess("ضضضض"))
+        assertTrue(Dictionary.isValidGuess("ضضضض"))
+        assertFalse(Dictionary.isValidGuess("1234"))
         assertTrue(Dictionary.isValidGuess("بيت"))
     }
 

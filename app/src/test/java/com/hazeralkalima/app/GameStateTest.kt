@@ -33,7 +33,7 @@ class GameStateTest {
     fun testUnknownWordIsRejected() {
         val game = GameState(GameMode.RANDOM, 3, "باب")
         val result = game.submitGuess("ضضض")
-        assertEquals(SubmitResult.InvalidWord, result)
+        assertEquals(SubmitResult.NotInDictionary, result)
     }
 
     @Test
@@ -78,8 +78,8 @@ class GameStateTest {
     fun testHardModeRequiresYellowLetters() {
         // target: "علم"
         val game = GameState(GameMode.RANDOM, 3, "علم", hardMode = true)
-        game.submitGuess("عمل") // 'ع' and 'ل' are green, 'م' is yellow
-        val res = game.submitGuess("عدل") // keeps green 'ع' and 'ل', but misses yellow 'م'
+        game.submitGuess("عمل") // 'ع' is green, 'ل' is green/yellow, 'م' is yellow
+        val res = game.submitGuess("عدل") // missing yellow letters (e.g. 'م')
         assertEquals(SubmitResult.MissingYellow, res)
     }
 

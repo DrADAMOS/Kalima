@@ -1,6 +1,9 @@
 package com.hazeralkalima.app
 
 import com.hazeralkalima.app.data.Dictionary
+import com.hazeralkalima.app.ui.theme.GameTheme
+import com.hazeralkalima.app.ui.theme.ThemeManager
+import com.hazeralkalima.app.ui.theme.isLight
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -53,5 +56,13 @@ class DictionaryTest {
     fun testIsValidGuess() {
         assertFalse(Dictionary.isValidGuess("ضضضض"))
         assertTrue(Dictionary.isValidGuess("بيت"))
+    }
+
+    @Test
+    fun testCandyThemeIsLight() {
+        val candy = ThemeManager.of(GameTheme.CANDY)
+        assertTrue(candy.isLight())
+        val original = ThemeManager.of(GameTheme.ORIGINAL)
+        assertFalse(original.isLight())
     }
 }

@@ -86,7 +86,7 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp),
         ) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(6.dp))
 
             // شريط الأيقونات العلوي
             Row(
@@ -99,27 +99,27 @@ fun HomeScreen(
                 HeaderIcon(Icons.Filled.Settings, "الإعدادات", colors, onSettings)
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
             // العنوان
             Text(
                 text = "احزر الكلمة",
                 color = colors.text,
-                fontSize = 36.sp,
+                fontSize = 32.sp,
                 fontWeight = FontWeight.Black,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(2.dp))
             Text(
                 text = "خمّن الكلمة!",
                 color = colors.textDim,
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
             // تحدي اليوم
             ModeCard(
@@ -134,7 +134,7 @@ fun HomeScreen(
                 },
             )
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(8.dp))
 
             // بلا نهاية
             ModeCard(
@@ -146,7 +146,7 @@ fun HomeScreen(
                 onClick = { onPlay(GameMode.ENDLESS, 5) },
             )
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(8.dp))
 
             // عشوائي
             ModeCard(
@@ -158,7 +158,7 @@ fun HomeScreen(
                 onClick = { onPlay(GameMode.RANDOM, Dictionary.lengths.random()) },
             )
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(8.dp))
 
             // وضع التعلّم
             ModeCard(
@@ -170,23 +170,23 @@ fun HomeScreen(
                 onClick = onLearn,
             )
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(8.dp))
 
             // الوضع الصعب
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(18.dp))
+                    .clip(RoundedCornerShape(16.dp))
                     .background(colors.card)
-                    .padding(horizontal = 18.dp, vertical = 10.dp),
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("🔥", fontSize = 22.sp)
-                Spacer(Modifier.width(12.dp))
+                Text("🔥", fontSize = 20.sp)
+                Spacer(Modifier.width(10.dp))
                 Text(
                     text = "الوضع الصعب",
                     color = colors.text,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f),
                 )
@@ -200,16 +200,16 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
             // اختيار سريع لطول الكلمة متمركز
             Text(
                 text = "اختيار سريع لطول الكلمة",
                 color = colors.textDim,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -218,7 +218,7 @@ fun HomeScreen(
                 Dictionary.lengths.take(8).forEach { len ->
                     Box(
                         modifier = Modifier
-                            .size(44.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
                             .background(colors.card)
                             .border(2.dp, colors.accent.copy(alpha = 0.4f), CircleShape)
@@ -228,14 +228,14 @@ fun HomeScreen(
                         Text(
                             text = "$len",
                             color = colors.text,
-                            fontSize = 16.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.ExtraBold,
                         )
                     }
                 }
             }
 
-            Spacer(Modifier.height(30.dp))
+            Spacer(Modifier.height(20.dp))
         }
     }
 }
@@ -255,9 +255,9 @@ private fun HeaderIcon(
             imageVector = icon,
             contentDescription = label,
             tint = colors.textDim,
-            modifier = Modifier.size(26.dp),
+            modifier = Modifier.size(24.dp),
         )
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(2.dp))
         Text(text = label, color = colors.textDim, fontSize = 10.sp)
     }
 }
@@ -274,32 +274,32 @@ private fun ModeCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(color.copy(alpha = 0.15f))
-            .border(1.dp, color.copy(alpha = 0.3f), RoundedCornerShape(18.dp))
+            .border(1.dp, color.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
-            .padding(18.dp),
+            .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(14.dp))
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .background(color.copy(alpha = 0.25f)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(26.dp))
+            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
         }
-        Spacer(Modifier.width(16.dp))
+        Spacer(Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
                 color = colors.text,
-                fontSize = 17.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(Modifier.height(3.dp))
-            Text(text = subtitle, color = colors.textDim, fontSize = 13.sp)
+            Spacer(Modifier.height(2.dp))
+            Text(text = subtitle, color = colors.textDim, fontSize = 12.sp)
         }
     }
 }

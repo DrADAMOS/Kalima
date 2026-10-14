@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "2026-10-15.1",
+  "version": "2026-10-15.2",
   "description": "Curated Arabic additions for Kalima. Only Arabic words of 3–8 letters are included; normalized duplicates are removed. Daily answers remain built-in for cross-device consistency.",
   "answers": [
     "دفء",
@@ -1269,6 +1269,7 @@
     "أسترالي"
   ],
   "guesses": [
+    "مضض",
     "سار",
     "نام",
     "قام",

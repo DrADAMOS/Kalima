@@ -1,7 +1,6 @@
 package com.hazeralkalima.app
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -27,9 +26,20 @@ import com.hazeralkalima.app.ui.theme.systemBarArgb
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val prefs = Preferences(this)
+        val themeColors = ThemeManager.of(prefs.gameTheme)
+        val isLight = themeColors.isLight()
+        val barColor = themeColors.systemBarArgb()
+
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            statusBarStyle = if (isLight)
+                SystemBarStyle.light(barColor, barColor)
+            else
+                SystemBarStyle.dark(barColor),
+            navigationBarStyle = if (isLight)
+                SystemBarStyle.light(barColor, barColor)
+            else
+                SystemBarStyle.dark(barColor),
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
@@ -51,19 +61,11 @@ fun KalimaApp() {
     val prefs = remember { Preferences(context) }
     val theme = prefs.gameTheme
 
-    // أشرطة النظام تتبع الثيم المختار:
-    // الثيمات الفاتحة (الحلويات) تحتاج أيقونات داكنة، وإلا اختفت الأيقونات
+    // أشرطة النظام تتبع الثيم المختار
     LaunchedEffect(theme) {
         val activity = context as? Activity ?: return@LaunchedEffect
         val colors = ThemeManager.of(theme)
-        val window = activity.window
-
-        @Suppress("DEPRECATION")
-        window.statusBarColor = colors.systemBarArgb()
-        @Suppress("DEPRECATION")
-        window.navigationBarColor = colors.systemBarArgb()
-
-        WindowInsetsControllerCompat(window, view).apply {
+        WindowInsetsControllerCompat(activity.window, view).apply {
             isAppearanceLightStatusBars = colors.isLight()
             isAppearanceLightNavigationBars = colors.isLight()
         }

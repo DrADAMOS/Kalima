@@ -1,4 +1,4 @@
-﻿package com.adamos.kalima.data
+package com.adamos.kalima.data
 
 import android.content.Context
 import kotlin.random.Random
@@ -247,17 +247,61 @@ object Dictionary {
     private val enrichedAnswers = emptyList<String>()
     private val enrichedGuesses = emptyList<String>()
 
-    private val runtimeRemoteWords = mutableSetOf<String>()
+    private val runtimeRemoteWords: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
+    /**
+     * Load only the documented answer/guess arrays from the bundled snapshot.
+     * Parsing JSON structurally avoids accidentally treating words in metadata as
+     * dictionary entries and supports Arabic letters consistently.
+     */
     fun init(context: Context) {
         try {
-            val inputStream = context.assets.open("remote-dictionary-v1.json")
-            val jsonStr = inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-            val regex = "\"([\\u0621-\\u064A\\u0629\\u0649]{3,8})\"".toRegex()
-            regex.findAll(jsonStr).forEach { match ->
-                runtimeRemoteWords.add(normalize(match.groupValues[1]))
+            val jsonStr = context.assets.open("remote-dictionary-v1.json")
+                .bufferedReader(Charsets.UTF_8).use { it.readText() }
+            val root = org.json.JSONObject(jsonStr)
+            if (root.optInt("schemaVersion", -1) != 1) return
+            addSnapshotArray(root.optJSONArray("answers"), runtimeRemoteWords)
+            addSnapshotArray(root.optJSONArray("guesses"), runtimeRemoteWords)
+            loadExpandedGuessAsset(context)
+        } catch (e: Exception) {
+            android.util.Log.w("KalimaDictionary", "Could not load bundled dictionary snapshot", e)
+        }
+    }
+
+    /**
+     * Load the generated, offline-first expanded guess list. This asset is generated
+     * from the licensed Arabic word-list source by tools/build_arabic_dictionary.py.
+     * Read it line-by-line to avoid creating a second giant String in memory.
+     */
+    private fun loadExpandedGuessAsset(context: Context) {
+        try {
+            context.assets.open("arabic-guess-words.txt").bufferedReader(Charsets.UTF_8).useLines { lines ->
+                lines.forEach { raw ->
+                    val word = raw.trim()
+                    if (isValidGuess(word)) runtimeRemoteWords.add(normalize(word))
+                }
             }
-        } catch (_: Exception) {}
+        } catch (e: java.io.IOException) {
+            // The generated asset is optional until the dictionary build script has run.
+            android.util.Log.w("KalimaDictionary", "Expanded offline word list is unavailable", e)
+        }
+    }
+
+    private fun addSnapshotArray(array: org.json.JSONArray?, destination: MutableSet<String>) {
+        if (array == null) return
+        for (index in 0 until minOf(array.length(), 100_000)) {
+            val word = array.optString(index, "").trim()
+            if (isValidGuess(word)) destination.add(normalize(word))
+        }
+    }
+
+    /** Merge validated words from the online snapshot into the thread-safe guess dictionary. */
+    fun applyOnlineWords(words: Collection<String>) {
+        words.asSequence()
+            .map { it.trim() }
+            .filter { isValidGuess(it) }
+            .map { normalize(it) }
+            .forEach { runtimeRemoteWords.add(it) }
     }
 
     private val jvmRemoteWords: Set<String> by lazy {
@@ -270,15 +314,17 @@ object Dictionary {
         )
         for (file in candidates) {
             try {
-                if (file.exists()) {
-                    val jsonStr = file.readText(Charsets.UTF_8)
-                    val regex = "\"([\\u0621-\\u064A\\u0629\\u0649]{3,8})\"".toRegex()
-                    regex.findAll(jsonStr).forEach { match ->
-                        set.add(normalize(match.groupValues[1]))
+                if (file.isFile) {
+                    val root = org.json.JSONObject(file.readText(Charsets.UTF_8))
+                    if (root.optInt("schemaVersion", -1) == 1) {
+                        addSnapshotArray(root.optJSONArray("answers"), set)
+                        addSnapshotArray(root.optJSONArray("guesses"), set)
                     }
                     break
                 }
-            } catch (_: Exception) {}
+            } catch (_: Exception) {
+                // Try the next known repository-relative location.
+            }
         }
         set
     }
@@ -324,12 +370,18 @@ object Dictionary {
         "ظلم", "خوف", "كره", "فناء", "عدم",
     )
 
-    /** تطبيع الحروف: أ إ آ ← ا، ة ← ه */
+    /**
+     * Normalize Arabic input for dictionary comparison: remove tashkeel and
+     * tatweel, normalize common alef variants, and preserve the original display
+     * spelling elsewhere. Mapping ta marbuta to ha retains existing game behavior.
+     */
     fun normalize(text: String): String = buildString(text.length) {
-        for (i in 0 until text.length) {
-            when (val c = text[i]) {
-                'أ', 'إ', 'آ' -> append('ا')
-                'ة' -> append('ه')
+        for (c in text) {
+            when {
+                c == '\u0640' -> Unit // tatweel
+                c in '\u064B'..'\u065F' || c == '\u0670' || c in '\u06D6'..'\u06ED' -> Unit
+                c == 'أ' || c == 'إ' || c == 'آ' || c == 'ٱ' -> append('ا')
+                c == 'ة' -> append('ه')
                 else -> append(c)
             }
         }
@@ -394,8 +446,10 @@ object Dictionary {
      * هل النص حروف عربية بطول صحيح؟
      * لا تفحص وجود الكلمة في القاموس — انظر isGuessable لذلك.
      */
-    fun isValidGuess(guess: String): Boolean =
-        guess.length in 3..8 && guess.all { it.isArabicLetter() }
+    fun isValidGuess(guess: String): Boolean {
+        val normalized = normalize(guess.trim())
+        return normalized.length in 3..8 && normalized.all { it.isArabicLetter() }
+    }
 
     private fun Char.isArabicLetter(): Boolean =
         this in '\u0621'..'\u064A' || this == '\u0629' || this == '\u0649'

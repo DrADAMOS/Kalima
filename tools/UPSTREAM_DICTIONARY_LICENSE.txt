@@ -1,0 +1,3 @@
+Arabic word list source: MustafaLinux/arabic-words-list
+Repository: https://github.com/MustafaLinux/arabic-words-list
+The upstream repository identifies its license as MIT. Consult the upstream LICENSE file and retain attribution when redistributing any generated dictionary data derived from that source.

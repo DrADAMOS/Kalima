@@ -1,4 +1,4 @@
-﻿package com.adamos.kalima
+package com.adamos.kalima
 
 import android.app.Activity
 import android.graphics.Color
@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.view.WindowInsetsControllerCompat
 import com.adamos.kalima.data.Dictionary
+import com.adamos.kalima.data.DictionarySync
 import com.adamos.kalima.data.Preferences
 import com.adamos.kalima.ui.AppRoot
 import com.adamos.kalima.ui.theme.KalimaTheme
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Dictionary.init(applicationContext)
+        DictionarySync.initialize(applicationContext)
         // في onCreate نجعل الأشرطة شفافة فقط. لون الخلفية واتجاه الأيقونات
         // يُضبطان من KalimaApp حسب الثيم المختار.
         enableEdgeToEdge(

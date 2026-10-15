@@ -328,6 +328,7 @@ fun GameScreen(
                 usedLetters = game.usedLetters(),
                 colors = colors,
                 enabled = !game.isGameOver && !dailyFinished,
+                revealedLetters = game.hintRevealedLetters(),
                 onKey = {
                     game.addLetter(it)
                     tick++

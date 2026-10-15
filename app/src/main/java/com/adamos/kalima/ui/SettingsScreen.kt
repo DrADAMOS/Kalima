@@ -180,7 +180,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             ToggleRow(
                 label = "👶 وضع الطفل فقط",
-                desc = "يخفي الإعلانات والمشتريات",
+                desc = "يضبط تفضيلات الأمان والقاموس المناسب للعائلة",
                 checked = kidMode,
                 colors = colors,
             ) { newChecked ->
@@ -245,9 +245,16 @@ fun SettingsScreen(onBack: () -> Unit) {
                 desc = "تصفية الكلمات غير المناسبة",
                 checked = safeDict,
                 colors = colors,
-            ) {
-                safeDict = it
-                prefs.safeDictionaryOnly = it
+            ) { newChecked ->
+                if (!newChecked && safeDict && hasPin) {
+                    pinInput = ""
+                    pinConfirmInput = ""
+                    pinError = null
+                    pinDialogMode = PinDialogMode.VERIFY_TO_UNLOCK_SAFE_DICT
+                } else {
+                    safeDict = newChecked
+                    prefs.safeDictionaryOnly = newChecked
+                }
             }
 
             Spacer(Modifier.height(22.dp))
@@ -327,7 +334,12 @@ fun SettingsScreen(onBack: () -> Unit) {
             },
             title = {
                 Text(
-                    text = if (pinDialogMode == PinDialogMode.SET_NEW) "تعيين رمز PIN للرقابة الأبوية" else "أدخل رمز PIN للمتابعة",
+                    text = when (pinDialogMode) {
+                        PinDialogMode.SET_NEW -> "تعيين رمز PIN للرقابة الأبوية"
+                        PinDialogMode.VERIFY_TO_UNLOCK -> "أدخل رمز PIN لإيقاف وضع الطفل"
+                        PinDialogMode.VERIFY_TO_UNLOCK_SAFE_DICT -> "أدخل رمز PIN لتخطي القاموس الآمن"
+                        null -> ""
+                    },
                     color = colors.text,
                 )
             },
@@ -366,7 +378,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 pinInput != pinConfirmInput ->
                                     pinError = "الرمزان غير متطابقين"
                                 prefs.setParentalPin(pinInput) -> {
-                                    // لا يُفعَّل وضع الطفل إلا بعد نجاح ضبط الـ PIN
                                     kidMode = true
                                     prefs.kidMode = true
                                     pinStateVersion++
@@ -380,6 +391,16 @@ fun SettingsScreen(onBack: () -> Unit) {
                             if (prefs.verifyParentalPin(pinInput)) {
                                 kidMode = false
                                 prefs.kidMode = false
+                                pinDialogMode = null
+                                pinError = null
+                            } else {
+                                pinError = "رمز PIN غير صحيح"
+                            }
+                        }
+                        PinDialogMode.VERIFY_TO_UNLOCK_SAFE_DICT -> {
+                            if (prefs.verifyParentalPin(pinInput)) {
+                                safeDict = false
+                                prefs.safeDictionaryOnly = false
                                 pinDialogMode = null
                                 pinError = null
                             } else {
@@ -461,4 +482,4 @@ private fun ToggleRow(
     }
 }
 
-private enum class PinDialogMode { SET_NEW, VERIFY_TO_UNLOCK }
+private enum class PinDialogMode { SET_NEW, VERIFY_TO_UNLOCK, VERIFY_TO_UNLOCK_SAFE_DICT }

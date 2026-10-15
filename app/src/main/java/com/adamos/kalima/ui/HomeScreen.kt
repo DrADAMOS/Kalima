@@ -67,7 +67,7 @@ fun HomeScreen(
     val colors: ThemeColors = ThemeManager.of(prefs.gameTheme)
 
     var hardMode by remember { mutableStateOf(prefs.hardMode) }
-    val totalDaily = Dictionary.lengths.intersect(3..7).size
+    val totalDaily = Dictionary.lengths.size
     var dailyDone by remember { mutableStateOf(prefs.dailyCompletedCount()) }
 
     Box(
@@ -91,7 +91,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 HeaderIcon(Icons.AutoMirrored.Filled.HelpOutline, "كيف تلعب", colors, onHowToPlay)
-                HeaderIcon(Icons.Filled.EmojiEvents, "المتصدرون", colors, onLeaderboard)
+                HeaderIcon(Icons.Filled.EmojiEvents, "السجلات", colors, onLeaderboard)
                 HeaderIcon(Icons.Filled.School, "التعلّم", colors, onLearn)
                 HeaderIcon(Icons.Filled.Settings, "الإعدادات", colors, onSettings)
             }
@@ -152,7 +152,7 @@ fun HomeScreen(
                     icon = Icons.Filled.WbSunny,
                     colors = colors,
                     onClick = {
-                        val nextLen = (3..7).firstOrNull { !prefs.isDailyFinished(it) } ?: 5
+                        val nextLen = Dictionary.lengths.firstOrNull { !prefs.isDailyFinished(it) } ?: 5
                         onPlay(GameMode.DAILY, nextLen)
                     },
                 )
@@ -216,7 +216,7 @@ fun HomeScreen(
                 )
             }
 
-            // اختيار سريع لطول الكلمة متمركز
+            // اختيار سريع لطول الكلمة متمركز (يشمل أطوال 3 حتى 8)
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -230,12 +230,12 @@ fun HomeScreen(
                 Spacer(Modifier.height(4.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                 ) {
-                    Dictionary.lengths.take(8).forEach { len ->
+                    Dictionary.lengths.forEach { len ->
                         Box(
                             modifier = Modifier
-                                .size(34.dp)
+                                .size(32.dp)
                                 .clip(CircleShape)
                                 .background(colors.card)
                                 .border(1.5.dp, colors.accent.copy(alpha = 0.4f), CircleShape)
@@ -245,7 +245,7 @@ fun HomeScreen(
                             Text(
                                 text = "$len",
                                 color = colors.text,
-                                fontSize = 13.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.ExtraBold,
                             )
                         }

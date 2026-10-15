@@ -66,6 +66,17 @@ class GameStateTest {
     }
 
     @Test
+    fun testHintSkippingAndBackspaceProtection() {
+        val target = Dictionary.randomWord(4)
+        val game = GameState(GameMode.RANDOM, 4, target, hintCount = 1)
+        assertTrue(game.useHint())
+        game.addLetter("ق")
+        game.addLetter("ل")
+        game.addLetter("م")
+        assertEquals(4, game.currentRowLetters().length)
+    }
+
+    @Test
     fun testHardModeBlocksBrokenGreen() {
         // target: "بيت"
         val game = GameState(GameMode.RANDOM, 3, "بيت", hardMode = true)
@@ -122,4 +133,3 @@ class GameStateTest {
         assertEquals("", letters)
     }
 }
-

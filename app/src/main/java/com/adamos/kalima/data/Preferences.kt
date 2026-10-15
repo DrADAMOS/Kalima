@@ -100,6 +100,9 @@ class Preferences(context: Context) {
         "thirty_wins" to "محترف 💎",
         "pet_evolved" to "مربي الحيوانات 🐉",
         "daily_champ" to "بطل التحدي 🏆",
+        "streak_3" to "شعلة الأسبوع 🔥",
+        "all_lengths" to "ملك الكلمات 👑",
+        "speed_five" to "البرق ⚡",
     )
 
     fun checkAndUnlockBadges(won: Boolean, attemptsCount: Int, hintsUsed: Int, dailyAllDone: Boolean): String? {
@@ -112,6 +115,9 @@ class Preferences(context: Context) {
             if (hintsUsed == 0 && unlockBadge("no_hints")) unlockedName = badgeNames["no_hints"]
             if (gamesWon >= 50 && unlockBadge("pet_evolved")) unlockedName = badgeNames["pet_evolved"]
             if (dailyAllDone && unlockBadge("daily_champ")) unlockedName = badgeNames["daily_champ"]
+            if (currentStreak >= 3 && unlockBadge("streak_3")) unlockedName = badgeNames["streak_3"]
+            if (dailyCompletedLengths().size >= 5 && unlockBadge("all_lengths")) unlockedName = badgeNames["all_lengths"]
+            if (attemptsCount <= 2 && unlockBadge("speed_five")) unlockedName = badgeNames["speed_five"]
         }
         return unlockedName
     }

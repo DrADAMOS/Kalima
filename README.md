@@ -8,7 +8,7 @@
 
 - **Android Studio** (Ladybug أو أحدث)
 - **JDK 17**
-- Android SDK 34
+- Android SDK 35
 - جهاز أندرويد (API 24+) أو محاكي
 
 **لا حاجة لـ Flutter SDK إطلاقًا.**
@@ -34,10 +34,10 @@
 ## هيكل المشروع
 
 ```
-app/src/main/java/com/hazeralkalima/app/
+app/src/main/java/com/adamos/kalima/
 ├── MainActivity.kt            نقطة الدخول
 ├── data/
-│   ├── Dictionary.kt          قاموس عربي (~500 كلمة، 3–10 حروف)
+│   ├── Dictionary.kt          قاموس عربي موسّع (3–8 حروف)
 │   ├── GameState.kt           منطق المطابقة والوضع الصعب
 │   ├── Preferences.kt         تخزين محلي (SharedPreferences)
 │   └── Rewards.kt             الشارات والكائن المتطور
@@ -48,13 +48,13 @@ app/src/main/java/com/hazeralkalima/app/
     ├── SettingsScreen.kt      الإعدادات + الرقابة الأبوية
     ├── RewardsScreen.kt       المكافآت والإحصائيات
     ├── LearnScreen.kt         وضع التعلّم
-    ├── LeaderboardScreen.kt   لوحة المتصدرين
+    ├── LeaderboardScreen.kt   السجلات والإحصائيات
     ├── HowToPlayScreen.kt     شرح القواعد
     ├── components/
     │   ├── WordGrid.kt        شبكة الكلمات
     │   └── ArabicKeyboard.kt  لوحة المفاتيح العربية
     └── theme/
-        ├── ThemeManager.kt    6 ثيمات كاملة
+        ├── ThemeManager.kt    ثيمات كاملة
         └── Theme.kt           ثيم Compose الأساسي
 ```
 
@@ -64,13 +64,13 @@ app/src/main/java/com/hazeralkalima/app/
 
 | الميزة | التفاصيل |
 |---|---|
-| **الأطوال** | 3 → 10 حروف |
-| **الثيمات** | 6: الأصلي · 🚀 الفضاء · 🦁 الحيوانات · 🍭 الحلويات · 🌊 المحيط · 🦸 الأبطال |
+| **الأطوال** | 3 → 8 حروف |
+| **الثيمات** | متعددة (الأصلي، الفضاء، الحيوانات، الحلويات، المحيط، الأبطال) |
 | **المستويات** | 🐣 مبتدئ (4–7) · 🐥 متوسط (8–11) · 🐓 متقدم (12+) |
 | **الشارات** | 10 شارات منها واحدة سرية |
 | **الكائن** | 🥚 → 🐣 → 🐥 → 🐓 → 🦅 |
 | **وضع التعلّم** | بطاقات وتحدي إملاء |
-| **الرقابة الأبوية** | وضع الطفل · قاموس آمن |
+| **الرقابة الأبوية** | وضع الطفل · حماية بـ PIN · قاموس آمن |
 | **الوضع الصعب** | إلزام الحروف الخضراء والصفراء |
 
 ### ميزات خاصة بالعربية
@@ -89,10 +89,3 @@ app/src/main/java/com/hazeralkalima/app/
 ```
 
 الملف الناتج: `app/build/outputs/apk/release/app-release.apk`
-
----
-
-## ملاحظة على الإصدار السابق
-
-هذا المشروع كان مكتوبًا بـ Flutter سابقًا، ثم حُوّل بالكامل إلى Kotlin أصلي.
-سجلّ التحويل محفوظ في فروع المستودع القديمة إن احتجته.

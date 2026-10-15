@@ -63,17 +63,40 @@ class GameState(
         if (isGameOver || currentAttempt >= grid.size) ""
         else (0 until wordLength).joinToString("") { grid[currentAttempt][it].letter }
 
-    /** إضافة حرف للصف الحالي */
-    fun addLetter(letter: String) {
-        if (isGameOver || currentAttempt >= grid.size || currentColumn >= wordLength) return
-        grid[currentAttempt][currentColumn] = LetterCell(letter, LetterStatus.EMPTY)
-        currentColumn++
+    /** هل العمود في الصف الحالي مكشوف بتلميح؟ */
+    private fun isHintedCol(col: Int): Boolean {
+        val cell = grid.getOrNull(currentAttempt)?.getOrNull(col)
+        return cell != null && cell.letter.isNotEmpty() && cell.status == LetterStatus.EMPTY
     }
 
-    /** حذف آخر حرف */
+    /** إضافة حرف للصف الحالي (مع تخطي الأعمدة المكشوفة بالتلميح) */
+    fun addLetter(letter: String) {
+        if (isGameOver || currentAttempt >= grid.size) return
+        while (currentColumn < wordLength && isHintedCol(currentColumn)) {
+            currentColumn++
+        }
+        if (currentColumn >= wordLength) return
+        grid[currentAttempt][currentColumn] = LetterCell(letter, LetterStatus.EMPTY)
+        currentColumn++
+        while (currentColumn < wordLength && isHintedCol(currentColumn)) {
+            currentColumn++
+        }
+    }
+
+    /** حذف آخر حرف (مع منع حذف الحروف المكشوفة بالتلميح) */
     fun removeLetter() {
-        if (isGameOver || currentColumn == 0) return
+        if (isGameOver || currentColumn <= 0) return
         currentColumn--
+        while (currentColumn >= 0 && isHintedCol(currentColumn)) {
+            currentColumn--
+        }
+        if (currentColumn < 0) {
+            currentColumn = 0
+            while (currentColumn < wordLength && isHintedCol(currentColumn)) {
+                currentColumn++
+            }
+            return
+        }
         grid[currentAttempt][currentColumn] = LetterCell()
     }
 
@@ -115,6 +138,9 @@ class GameState(
             if (!doneBefore && !isFilledInCurrentRow && !isSameLetterRevealedEmpty && cell != null) {
                 hintCount--
                 grid[currentAttempt][c] = LetterCell(targetWord[c].toString(), LetterStatus.EMPTY)
+                while (currentColumn < wordLength && isHintedCol(currentColumn)) {
+                    currentColumn++
+                }
                 return true
             }
         }
@@ -149,32 +175,34 @@ class GameState(
             if (idx != -1) {
                 result[i] = 1
                 target[idx] = "#"
+                attempt[i] = "*"
             }
         }
+
         return result
     }
 
-    /** إرسال تخمين ويرجع النتيجة */
+    /** إرسال تخمين للسيستم */
     fun submitGuess(guess: String): SubmitResult {
         if (isGameOver) return SubmitResult.AlreadyOver
         if (guess.length != wordLength) return SubmitResult.NotRightLength
         if (!Dictionary.isValidGuess(guess)) return SubmitResult.InvalidWord
         if (!Dictionary.isGuessable(guess)) return SubmitResult.NotInDictionary
 
-        // قيود الوضع الصعب
-        if (hardMode && attempts.isNotEmpty()) {
+        // فحص الوضع الصعب (Hard Mode)
+        if (hardMode && attemptsUsed > 0) {
             val lastGuess = attempts.last()
             val lastEval = evaluate(lastGuess)
-            val normalizedGuess = Dictionary.normalize(guess)
 
+            // 1. يجب الحفاظ على الحروف الصحيحة (خضراء) في مكانها
             for (i in 0 until wordLength) {
-                if (lastEval[i] == 2 &&
-                    Dictionary.normalize(guess[i].toString()) !=
-                    Dictionary.normalize(lastGuess[i].toString())
-                ) {
+                if (lastEval[i] == 2 && Dictionary.normalize(guess[i].toString()) != Dictionary.normalize(lastGuess[i].toString())) {
                     return SubmitResult.BreaksGreen
                 }
             }
+
+            // 2. يجب استخدام الحروف الموجودة (صفراء) في التخمين الجديد
+            val normalizedGuess = Dictionary.normalize(guess)
             for (i in 0 until wordLength) {
                 if (lastEval[i] == 1 &&
                     !normalizedGuess.contains(Dictionary.normalize(lastGuess[i].toString()))
@@ -184,21 +212,22 @@ class GameState(
             }
         }
 
-        // اكتب الصف وألوانه
-        val evaluation = evaluate(guess)
+        attempts.add(guess)
+        val eval = evaluate(guess)
+
+        // تعيين حالة الخلايا في الصف الحالي
         for (i in 0 until wordLength) {
-            val status = when (evaluation[i]) {
+            val status = when (eval[i]) {
                 2 -> LetterStatus.CORRECT
                 1 -> LetterStatus.PRESENT
                 else -> LetterStatus.ABSENT
             }
             grid[currentAttempt][i] = LetterCell(guess[i].toString(), status)
         }
-        attempts.add(guess)
 
-        if (evaluation.all { it == 2 }) {
-            isGameOver = true
+        if (guess.map { Dictionary.normalize(it.toString()) } == targetWord.map { Dictionary.normalize(it.toString()) }) {
             isWon = true
+            isGameOver = true
             return SubmitResult.Win
         }
 
@@ -207,55 +236,49 @@ class GameState(
 
         if (currentAttempt >= totalRows) {
             isGameOver = true
-            isWon = false
             return SubmitResult.Lose
         }
+
         return SubmitResult.Accepted
     }
 
-    private fun LetterStatus.priority(): Int = when (this) {
-        LetterStatus.CORRECT -> 3
-        LetterStatus.PRESENT -> 2
-        LetterStatus.ABSENT -> 1
-        LetterStatus.EMPTY -> 0
-    }
-
-    /** خريطة الحروف المستخدمة وأفضل حالة لكل منها (مطبّعة لتشارك أ/إ/آ مع ا) */
+    /** حروف لوحة المفاتيح الملونة (أولوية: أخضر > أصفر > رمادي) */
     fun usedLetters(): Map<String, LetterStatus> {
         val map = mutableMapOf<String, LetterStatus>()
         for (r in 0 until currentAttempt) {
-            for (c in 0 until wordLength) {
-                val cell = grid.getOrNull(r)?.getOrNull(c) ?: continue
-                if (cell.letter.isEmpty()) continue
-                val normalizedKey = Dictionary.normalize(cell.letter)
-                val existing = map[normalizedKey]
-                if (existing == null || cell.status.priority() > existing.priority()) {
-                    map[normalizedKey] = cell.status
+            val guess = attempts.getOrNull(r) ?: continue
+            val eval = evaluate(guess)
+            for (i in guess.indices) {
+                val letter = Dictionary.normalize(guess[i].toString())
+                val status = when (eval[i]) {
+                    2 -> LetterStatus.CORRECT
+                    1 -> LetterStatus.PRESENT
+                    else -> LetterStatus.ABSENT
+                }
+                val current = map[letter]
+                if (current == null || status.ordinal > current.ordinal) {
+                    map[letter] = status
                 }
             }
         }
         return map
     }
 
-    /** كل الصفوف للعرض (نسخة عميقة لحماية الحالة الداخلية) */
-    fun rowsSnapshot(): List<List<LetterCell>> = grid.map { it.toList() }
+    /** لقطة كاملة للحالة الحالية للشبكة */
+    fun rowsSnapshot(): List<List<LetterCell>> =
+        grid.map { row -> row.map { it.copy() } }
 }
 
-/** نتيجة إرسال تخمين */
+/** نتيجة محاولة التخمين */
 enum class SubmitResult {
     Accepted,
     Win,
     Lose,
-    /** ليس حروفًا عربية، أو طول خارج النطاق المسموح */
-    InvalidWord,
-    /** عربية صحيحة لكنها ليست في قاموس اللعبة */
-    NotInDictionary,
-    /** طول التخمين لا يطابق طول الجولة */
-    NotRightLength,
-    /** أُبقيت للتوافق مع الاختبارات القديمة */
     TooShort,
+    NotRightLength,
+    InvalidWord,
+    NotInDictionary,
     BreaksGreen,
     MissingYellow,
     AlreadyOver,
 }
-

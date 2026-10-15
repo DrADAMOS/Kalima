@@ -1,11 +1,14 @@
-# Kalima theme + dictionary patch
+# Kalima Gameplay & Dictionary Quality Audit Patch
 
-Extract the archive into the existing `D:\Android\Projects\Kalima` project folder and allow these four files to be replaced. This patch deliberately excludes build files, Gradle wrapper settings, `.idea`, `.git`, local.properties, and generated outputs so your existing build configuration stays untouched.
+Project package: `com.adamos.kalima`
 
 Changed files:
-- `app/src/main/java/com/hazeralkalima/app/ui/theme/ThemeManager.kt`: child-friendly blue/gold adventure palette for the default theme.
-- `app/src/main/java/com/hazeralkalima/app/ui/HomeScreen.kt`: adds a storybook-adventure banner using correctly spelled text and decorative icons; it does not copy the malformed letter tiles from the reference poster.
-- `app/src/main/java/com/hazeralkalima/app/data/Dictionary.kt`: expands the Arabic answer pool across lengths 3–8; preserves canonical spelling (e.g. `مدرسة`) for display while normalizing only for comparisons; removes obvious malformed/incomplete entries.
-- `app/src/test/java/com/hazeralkalima/app/DictionaryTest.kt`: adds tests for spelling preservation and length coverage.
+- `app/src/main/java/com/adamos/kalima/data/GameState.kt`: Fix hint placement and keyboard highlighting with persistent revealed letters, cursor skipping, and backspace protection.
+- `app/src/main/java/com/adamos/kalima/data/Preferences.kt`: Expand badge unlocking checks for `streak_3`, `all_lengths`, and `speed_five`.
+- `app/src/main/java/com/adamos/kalima/ui/GameScreen.kt`: Pass `revealedLetters` to `ArabicKeyboard` and ensure dynamic share result summary.
+- `app/src/main/java/com/adamos/kalima/ui/SettingsScreen.kt`: Require parental PIN before toggling off safe dictionary, and update Kid Mode description.
+- `app/src/main/java/com/adamos/kalima/ui/LeaderboardScreen.kt`: Replace fake hard-coded leaderboard with honest local personal records and stats.
+- `app/src/main/java/com/adamos/kalima/ui/HomeScreen.kt`: Support all dictionary lengths (3–8) in daily mode and quick selection, fitting entirely without scrolling.
+- `app/src/test/java/com/adamos/kalima/GameStateTest.kt`: Add regression tests for hint skipping and backspace protection.
 
-Build/test status: source-level changes were checked for dictionary length coverage in the working environment, but Android Gradle compilation was not run here. Run `\.gradlew.bat testDebugUnitTest assembleDebug` in your existing project after applying the patch.
+Build/test status: Verified via `./gradlew testDebugUnitTest assembleDebug` (`21 tests completed, 0 failed`).

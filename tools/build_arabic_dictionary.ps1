@@ -6,6 +6,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
+if ($MaxWords -lt 1) { throw "MaxWords must be greater than zero." }
+
 $repoRoot = (Get-Location).Path
 if (-not $SourcePath) {
     $SourcePath = Join-Path $env:TEMP 'kalima-arabic-words.txt'
@@ -35,8 +37,7 @@ function Normalize-ArabicWord([string]$Word) {
     return $s
 }
 
-# Read line-by-line. Source contains one word per line. Keep only Arabic-only words
-# of 3–8 letters and deduplicate by the same normalization used by the app.
+# Read line-by-line. Keep only Arabic-only words of 3–8 normalized letters.
 $seen = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 $candidates = [System.Collections.Generic.List[string]]::new()
 $reader = [System.IO.StreamReader]::new($SourcePath, [System.Text.Encoding]::UTF8, $true)
@@ -56,20 +57,38 @@ try {
 finally { $reader.Dispose() }
 Write-Progress -Activity 'Filtering Arabic words' -Completed
 
-# Spread a capped list across the complete alphabetically ordered source rather than
-# taking only its first entries. The app loads this file offline at startup.
+# Keep every 3- and 4-letter candidate. Only longer words are sampled when needed.
+# This prevents the alphabetical stride from randomly dropping core short guesses.
 $candidates.Sort([StringComparer]::Ordinal)
-$selected = [System.Collections.Generic.SortedSet[string]]::new([StringComparer]::Ordinal)
-if ($candidates.Count -le $MaxWords) {
-    foreach ($w in $candidates) { [void]$selected.Add($w) }
-} else {
-    $step = [double]$candidates.Count / [double]$MaxWords
-    for ($i = 0; $i -lt $MaxWords; $i++) {
-        [void]$selected.Add($candidates[[int][Math]::Floor($i * $step)])
+$shortWords = [System.Collections.Generic.List[string]]::new()
+$longWords = [System.Collections.Generic.List[string]]::new()
+foreach ($word in $candidates) {
+    if ($word.Length -le 4) {
+        $shortWords.Add($word)
+    } else {
+        $longWords.Add($word)
     }
 }
-# Explicit regression cases, merged into the broad lexicon (not answer words).
-foreach ($w in @('سلب','رقى','رقي')) { [void]$selected.Add((Normalize-ArabicWord $w)) }
+
+$selected = [System.Collections.Generic.SortedSet[string]]::new([StringComparer]::Ordinal)
+foreach ($word in $shortWords) { [void]$selected.Add($word) }
+
+$remaining = [Math]::Max(0, $MaxWords - $selected.Count)
+if ($remaining -gt 0) {
+    if ($longWords.Count -le $remaining) {
+        foreach ($word in $longWords) { [void]$selected.Add($word) }
+    } else {
+        $step = [double]$longWords.Count / [double]$remaining
+        for ($i = 0; $i -lt $remaining; $i++) {
+            [void]$selected.Add($longWords[[int][Math]::Floor($i * $step)])
+        }
+    }
+}
+
+# Guaranteed regression words; these are guesses only, never secret answers.
+foreach ($word in @('جحش','سلب','رقى','رقي')) {
+    [void]$selected.Add((Normalize-ArabicWord $word))
+}
 
 $outDir = Split-Path -Parent $OutputPath
 if (-not (Test-Path -LiteralPath $outDir)) { New-Item -ItemType Directory -Path $outDir -Force | Out-Null }
@@ -77,12 +96,14 @@ $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 [System.IO.File]::WriteAllLines($OutputPath, [string[]]@($selected), $utf8NoBom)
 
 $check = [System.IO.File]::ReadAllLines($OutputPath, [System.Text.Encoding]::UTF8)
-$required = @('سلب','رقى','رقي')
+$required = @('جحش','سلب','رقى','رقي')
 $missing = @($required | Where-Object { $_ -notin $check })
 if ($missing.Count -gt 0) { throw "Regression words missing: $($missing -join ', ')" }
+
 Write-Host "SUCCESS: created offline guess dictionary" -ForegroundColor Green
-Write-Host "Source words accepted before cap: $($candidates.Count)"
+Write-Host "Source words accepted before selection: $($candidates.Count)"
+Write-Host "Short words (3–4 letters) retained: $($shortWords.Count)"
 Write-Host "Output words: $($check.Count)"
-Write-Host "Verified: سلب, رقى, رقي"
+Write-Host "Verified: جحش, سلب, رقى, رقي"
 Write-Host "Output: $OutputPath"
-Write-Host "Note: This is a broad word list, not a proof that every entry is valid Modern Standard Arabic. Review licensing and quality before release."
+Write-Host "Note: This broad word list may contain errors; it is not a linguistic validator."

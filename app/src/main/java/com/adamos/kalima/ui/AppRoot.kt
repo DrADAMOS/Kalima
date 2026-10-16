@@ -1,5 +1,12 @@
 ﻿package com.adamos.kalima.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +38,15 @@ fun AppRoot() {
         screen = Screen.HOME
     }
 
-    when (screen) {
+    AnimatedContent(
+        targetState = screen,
+        transitionSpec = {
+            (fadeIn(tween(180)) + slideInHorizontally(tween(180)) { it / 18 }) togetherWith
+                (fadeOut(tween(120)) + slideOutHorizontally(tween(120)) { -it / 24 })
+        },
+        label = "screen-transition",
+    ) { targetScreen ->
+        when (targetScreen) {
         Screen.HOME -> HomeScreen(
             onPlay = { mode, length ->
                 gameMode = mode
@@ -63,5 +78,6 @@ fun AppRoot() {
         )
         Screen.LEADERBOARD -> LeaderboardScreen(onBack = { screen = Screen.HOME })
         Screen.HOW_TO_PLAY -> HowToPlayScreen(onBack = handleHowToBack)
+        }
     }
 }

@@ -4,10 +4,14 @@ Kalima dictionary builder (Windows PowerShell; no Python required)
 2. Run:
    powershell -ExecutionPolicy Bypass -File .\tools\build_arabic_dictionary.ps1
 
-The script downloads the public word list to %TEMP% if needed, filters Arabic-only entries to 3–8 letters, normalizes and deduplicates them, retains every accepted 3- and 4-letter word, and samples only longer words if the target budget (150,000 by default) is exceeded.
+The script downloads the public word list to tools/cache if needed, applies strict quality filters (Hamza position rules, repeated letter checks, glued prefix rejection, and a letter-bigram plausibility test against curated words), normalizes and deduplicates them, and samples entries to a target size of 30,000–60,000 words (45,000 by default). An optional local frequency ranking list can be supplied via -FreqPath.
 
-The builder always verifies these guess-list regression entries:
-   جحش, سلب, رقى, رقي
+To clean an existing guess list in place without downloading upstream sources:
+   powershell -ExecutionPolicy Bypass -File .\tools\clean_existing_guess_list.ps1
+   python3 tools/clean_existing_guess_list.py
+
+The builder always preserves curated answers and guess-list regression entries:
+   جحش, سلب, رقى, رقي, سماء, مدرسة, كتاب, دفء, ماء
 
 It writes:
    app\src\main\assets\arabic-guess-words.txt
@@ -16,6 +20,4 @@ Then run:
    .\gradlew.bat testDebugUnitTest
    .\gradlew.bat assembleDebug
 
-The project's Dictionary.kt must load arabic-guess-words.txt during normal application initialization. Verify this integration if using a different checkout.
-
-The source is a broad lexicon with acknowledged errors; the builder does not prove every entry is a valid word. It adds only to the guess dictionary and does not add entries to daily answer pools. The Python builder follows the same short-word retention policy and includes unit tests.
+The project's Dictionary.kt loads arabic-guess-words.txt during application initialization.

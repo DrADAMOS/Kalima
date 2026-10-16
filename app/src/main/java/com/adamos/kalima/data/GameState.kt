@@ -1,5 +1,7 @@
 ﻿package com.adamos.kalima.data
 
+import androidx.compose.runtime.Immutable
+
 /** حالة كل خلية في الشبكة */
 enum class LetterStatus { EMPTY, CORRECT, PRESENT, ABSENT }
 
@@ -7,6 +9,7 @@ enum class LetterStatus { EMPTY, CORRECT, PRESENT, ABSENT }
 enum class GameMode { DAILY, ENDLESS, RANDOM }
 
 /** خلية حرف واحدة */
+@Immutable
 data class LetterCell(
     val letter: String = "",
     val status: LetterStatus = LetterStatus.EMPTY,
@@ -25,6 +28,8 @@ class GameState(
     val extraRows: Int = 2,
     var hintCount: Int = 2,
     val hardMode: Boolean = false,
+    /** وضع الأطفال الآمن: تُرفض الكلمات المحجوبة كتخمين. */
+    val safeMode: Boolean = false,
 ) {
     init {
         require(wordLength > 0) { "طول الكلمة يجب أن يكون أكبر من صفر" }
@@ -55,6 +60,9 @@ class GameState(
         MutableList(wordLength) { LetterCell() }
     }
 
+    /** تتبع صريح لخلايا التلميحات لمنع خلطها مع الحروف المكتوبة يدوياً */
+    private val hintedCells = mutableSetOf<Pair<Int, Int>>()
+
     fun cellAt(row: Int, col: Int): LetterCell =
         grid.getOrNull(row)?.getOrNull(col) ?: LetterCell()
 
@@ -64,10 +72,7 @@ class GameState(
         else (0 until wordLength).joinToString("") { grid[currentAttempt][it].letter }
 
     /** هل العمود في الصف الحالي مكشوف بتلميح؟ */
-    private fun isHintedCol(col: Int): Boolean {
-        val cell = grid.getOrNull(currentAttempt)?.getOrNull(col)
-        return cell != null && cell.letter.isNotEmpty() && cell.status == LetterStatus.EMPTY
-    }
+    private fun isHintedCol(col: Int): Boolean = (currentAttempt to col) in hintedCells
 
     /** إضافة حرف للصف الحالي (مع تخطي الأعمدة المكشوفة بالتلميح) */
     fun addLetter(letter: String) {
@@ -83,21 +88,14 @@ class GameState(
         }
     }
 
-    /** حذف آخر حرف (مع منع حذف الحروف المكشوفة بالتلميح) */
+    /** حذف آخر حرف مكتوب، مع الحفاظ على الخانات التي كشفها التلميح. */
     fun removeLetter() {
-        if (isGameOver || currentColumn <= 0) return
-        currentColumn--
-        while (currentColumn >= 0 && isHintedCol(currentColumn)) {
-            currentColumn--
-        }
-        if (currentColumn < 0) {
-            currentColumn = 0
-            while (currentColumn < wordLength && isHintedCol(currentColumn)) {
-                currentColumn++
-            }
-            return
-        }
-        grid[currentAttempt][currentColumn] = LetterCell()
+        if (isGameOver) return
+        var col = currentColumn - 1
+        while (col >= 0 && isHintedCol(col)) col--
+        if (col < 0) return
+        grid[currentAttempt][col] = LetterCell()
+        currentColumn = col
     }
 
     /** إضافة صف إضافي (محدود) */
@@ -109,19 +107,18 @@ class GameState(
     }
 
     /**
-     * حروف كشفها التلميح في الصف الحالي (بحالة EMPTY).
-     * تُستخدم لتمييزها في لوحة المفاتيح عن الحروف غير المستخدمة.
+     * حروف كشفها التلميح في الصف الحالي.
      */
     fun hintRevealedLetters(): Set<String> =
-        grid.flatten()
-            .filter { it.status == LetterStatus.EMPTY && it.letter.isNotEmpty() }
-            .map { Dictionary.normalize(it.letter) }
+        hintedCells.asSequence()
+            .filter { (row, _) -> row == currentAttempt }
+            .mapNotNull { (row, col) -> grid.getOrNull(row)?.getOrNull(col)?.letter }
+            .filter { it.isNotEmpty() }
+            .map { Dictionary.normalize(it) }
             .toSet()
 
     /**
      * كشف حرف صحيح في موضعه.
-     * لا يكشف عمودًا كان صحيحًا في محاولة سابقة، ولا عمودًا ممتلئًا
-     * في الصف الحالي، ولا حرفًا مكشوفًا أصلًا في الصف الحالي.
      */
     fun useHint(): Boolean {
         if (hintCount <= 0 || isGameOver) return false
@@ -132,12 +129,19 @@ class GameState(
             }
             val cell = grid.getOrNull(currentAttempt)?.getOrNull(c)
             val isFilledInCurrentRow = cell != null && cell.letter.isNotEmpty()
-            val isSameLetterRevealedEmpty = (0 until wordLength).any {
-                grid.getOrNull(currentAttempt)?.getOrNull(it)?.letter == targetWord[c].toString()
+            // عدّ الحرف بدل البحث عن وجوده: يسمح بكشف المكرَّر في كلمات مثل «ممرات»
+            // ما دام عدد ظهوره في الصف الحالي أقل من عدد ظهوره في الكلمة الهدف.
+            val letterNorm = Dictionary.normalize(targetWord[c].toString())
+            val totalInTarget = targetWord.count { Dictionary.normalize(it.toString()) == letterNorm }
+            val usedInRow = (0 until wordLength).count {
+                val l = grid.getOrNull(currentAttempt)?.getOrNull(it)?.letter.orEmpty()
+                l.isNotEmpty() && Dictionary.normalize(l) == letterNorm
             }
-            if (!doneBefore && !isFilledInCurrentRow && !isSameLetterRevealedEmpty && cell != null) {
+            val letterQuotaReached = usedInRow >= totalInTarget
+            if (!doneBefore && !isFilledInCurrentRow && !letterQuotaReached && cell != null) {
                 hintCount--
                 grid[currentAttempt][c] = LetterCell(targetWord[c].toString(), LetterStatus.EMPTY)
+                hintedCells += currentAttempt to c
                 while (currentColumn < wordLength && isHintedCol(currentColumn)) {
                     currentColumn++
                 }
@@ -187,6 +191,7 @@ class GameState(
         if (isGameOver) return SubmitResult.AlreadyOver
         if (guess.length != wordLength) return SubmitResult.NotRightLength
         if (!Dictionary.isValidGuess(guess)) return SubmitResult.InvalidWord
+        if (safeMode && !Dictionary.isSafe(guess)) return SubmitResult.BlockedWord
         if (!Dictionary.isGuessable(guess)) return SubmitResult.NotInDictionary
 
         // فحص الوضع الصعب (Hard Mode)
@@ -274,10 +279,11 @@ enum class SubmitResult {
     Accepted,
     Win,
     Lose,
-    TooShort,
     NotRightLength,
     InvalidWord,
     NotInDictionary,
+    /** كلمة محجوبة في وضع الأطفال الآمن */
+    BlockedWord,
     BreaksGreen,
     MissingYellow,
     AlreadyOver,

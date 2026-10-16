@@ -4,20 +4,29 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.adamos.kalima.ui.theme.GameTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.security.MessageDigest
 import java.security.SecureRandom
 
 /**
  * تخزين محلي لكل إعدادات اللعبة والتقدّم — فوق SharedPreferences.
  */
-class Preferences(context: Context) {
+class Preferences(private val prefs: android.content.SharedPreferences) {
 
-    private val prefs = context.getSharedPreferences("kalima_prefs", Context.MODE_PRIVATE)
+    constructor(context: Context) : this(context.getSharedPreferences("kalima_prefs", Context.MODE_PRIVATE)) {
+        initOnce(context)
+    }
 
     // ---------- الثيم ----------
     var gameTheme: GameTheme
         get() = GameTheme.entries.getOrElse(prefs.getInt(KEY_THEME, 0)) { GameTheme.ORIGINAL }
-        set(value) = prefs.edit { putInt(KEY_THEME, value.ordinal) }
+        set(value) {
+            prefs.edit { putInt(KEY_THEME, value.ordinal) }
+            _themeState.value = value
+        }
+
+    val themeState: StateFlow<GameTheme> = _themeState
 
     // ---------- الوضع الصعب ----------
     var hardMode: Boolean
@@ -51,8 +60,8 @@ class Preferences(context: Context) {
         get() = prefs.getInt(KEY_BEST_STREAK, 0)
         private set(value) = prefs.edit { putInt(KEY_BEST_STREAK, value) }
 
-    /** تحديث الإحصائيات بعد جولة (تجنب التكرار في نفس الجولة) */
-    fun recordGameOnce(gameId: String, won: Boolean): Boolean {
+    /** تحديث الإحصائيات بعد جولة (تجنب التكرار في نفس الجولة مع قفل مزامنة مشترك) */
+    fun recordGameOnce(gameId: String, won: Boolean): Boolean = synchronized(lock) {
         val recordedKey = "recorded_$gameId"
         if (prefs.getBoolean(recordedKey, false)) return false
         prefs.edit { putBoolean(recordedKey, true) }
@@ -239,6 +248,20 @@ class Preferences(context: Context) {
     }
 
     companion object {
+        private val _themeState = MutableStateFlow(GameTheme.ORIGINAL)
+        private val lock = Any()
+        @Volatile private var isInitialized = false
+
+        @Synchronized
+        fun initOnce(context: Context) {
+            if (!isInitialized) {
+                val p = context.getSharedPreferences("kalima_prefs", Context.MODE_PRIVATE)
+                val current = GameTheme.entries.getOrElse(p.getInt(KEY_THEME, 0)) { GameTheme.ORIGINAL }
+                _themeState.value = current
+                isInitialized = true
+            }
+        }
+
         fun todayKey(): String {
             val cal = java.util.Calendar.getInstance()
             val y = cal.get(java.util.Calendar.YEAR)
@@ -278,4 +301,3 @@ internal fun hashPinForTest(pin: String, salt: ByteArray): String {
     }
     return bytes.joinToString("") { "%02x".format(it) }
 }
-

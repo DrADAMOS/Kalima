@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +47,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 fun LearnScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { Preferences(context) }
-    val colors: ThemeColors = ThemeManager.of(prefs.gameTheme)
+    val currentTheme by prefs.themeState.collectAsState(initial = prefs.gameTheme)
+    val colors: ThemeColors = ThemeManager.of(currentTheme)
 
     // بطاقات من كلمات 3 و4 حروف
     val cards = remember {

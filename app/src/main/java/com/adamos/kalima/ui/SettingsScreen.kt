@@ -34,6 +34,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,11 +62,13 @@ private const val PLAY_STORE_WEB_URL = "https://play.google.com/store/apps/detai
 fun SettingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { Preferences(context) }
-    val colors: ThemeColors = ThemeManager.of(prefs.gameTheme)
+    val currentTheme by prefs.themeState.collectAsState(initial = prefs.gameTheme)
+    val colors: ThemeColors = ThemeManager.of(currentTheme)
 
-    var theme by remember { mutableStateOf(prefs.gameTheme) }
+    var theme by remember(currentTheme) { mutableStateOf(currentTheme) }
     var ageLevel by remember { mutableStateOf(prefs.ageLevel) }
     var kidMode by remember { mutableStateOf(prefs.kidMode) }
+    var dailyLimit by remember { mutableStateOf(prefs.dailyLimitMinutes) }
     var safeDict by remember { mutableStateOf(prefs.safeDictionaryOnly) }
     // يُزاد عند تغيير حالة PIN ليُعاد رسم صف الحماية فورًا
     var pinStateVersion by remember { mutableStateOf(0) }
@@ -138,7 +141,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         Text(
                             text = tc.label,
                             color = if (selected) tc.accent2 else tc.textDim,
-                            fontSize = 9.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -207,6 +210,35 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
 
+            if (kidMode) {
+                Spacer(Modifier.height(8.dp))
+                Text("الحد اليومي لوقت اللعب", color = colors.text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text("الوقت يُحسب أثناء بقاء لعبة نشطة مفتوحة.", color = colors.textDim, fontSize = 12.sp)
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    listOf(0, 15, 30, 60).forEach { minutes ->
+                        val selected = dailyLimit == minutes
+                        TextButton(
+                            onClick = {
+                                dailyLimit = minutes
+                                prefs.dailyLimitMinutes = minutes
+                            },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(
+                                text = if (minutes == 0) "بلا حد" else "$minutes د",
+                                color = if (selected) colors.accentText else colors.text,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                            )
+                        }
+                    }
+                }
+                Text("المستخدم اليوم: ${prefs.playedMinutesToday()} دقيقة", color = colors.textDim, fontSize = 12.sp)
+            }
+
             Spacer(Modifier.height(8.dp))
 
             // صف حالة حماية PIN — يُقرأ من hasPin حتى يظهر التغيير فورًا
@@ -233,7 +265,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }) {
                     Text(
                         text = if (hasPin) "تغيير" else "إضافة",
-                        color = colors.accent,
+                        color = colors.accentText,
                         fontWeight = FontWeight.Bold,
                     )
                 }

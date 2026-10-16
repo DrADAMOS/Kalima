@@ -1,5 +1,9 @@
 ﻿package com.adamos.kalima.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,7 +28,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,14 +49,20 @@ import com.adamos.kalima.data.Rewards
 import com.adamos.kalima.ui.theme.ThemeColors
 import com.adamos.kalima.ui.theme.ThemeManager
 
-/** شاشة المكافآت — الشارات والكائن المتطور والإحصائيات */
+/** شاشة المكافآت — الشارات والكائن المتطور والإحصائيات مع حركة دخول خفيفة */
 @Composable
 fun RewardsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { Preferences(context) }
-    val colors: ThemeColors = ThemeManager.of(prefs.gameTheme)
+    val currentTheme by prefs.themeState.collectAsState(initial = prefs.gameTheme)
+    val colors: ThemeColors = ThemeManager.of(currentTheme)
     val unlocked = remember { prefs.unlockedBadges() }
     val pet = Rewards.currentPetStage(prefs.gamesWon)
+
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        visible = true
+    }
 
     Column(
         modifier = Modifier
@@ -56,67 +71,72 @@ fun RewardsScreen(onBack: () -> Unit) {
     ) {
         ScreenHeader("المكافآت والإنجازات", colors, onBack)
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .navigationBarsPadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 18.dp),
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 15 },
         ) {
-            // الكائن
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(colors.card)
-                    .padding(20.dp),
-                contentAlignment = Alignment.Center,
+                    .fillMaxSize()
+                    .navigationBarsPadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 18.dp),
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(pet.emoji, fontSize = 64.sp)
-                    Spacer(Modifier.height(8.dp))
-                    Text(pet.name, color = colors.text, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
-                    Spacer(Modifier.height(4.dp))
-                    Text("${prefs.gamesWon} فوز", color = colors.textDim, fontSize = 13.sp)
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-            Text(
-                text = "🏅 الشارات (${unlocked.size}/${Rewards.allBadges.size})",
-                color = colors.textDim,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Spacer(Modifier.height(12.dp))
-
-            Rewards.allBadges.chunked(3).forEach { row ->
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                // الكائن
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(colors.card)
+                        .padding(20.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    row.forEach { badge ->
-                        BadgeTile(badge, badge.id in unlocked, colors, Modifier.weight(1f))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(pet.emoji, fontSize = 64.sp)
+                        Spacer(Modifier.height(8.dp))
+                        Text(pet.name, color = colors.text, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                        Spacer(Modifier.height(4.dp))
+                        Text("${prefs.gamesWon} فوز", color = colors.textDim, fontSize = 13.sp)
                     }
-                    repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
                 }
+
+                Spacer(Modifier.height(20.dp))
+                Text(
+                    text = "🏅 الشارات (${unlocked.size}/${Rewards.allBadges.size})",
+                    color = colors.textDim,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(12.dp))
+
+                Rewards.allBadges.chunked(3).forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        row.forEach { badge ->
+                            BadgeTile(badge, badge.id in unlocked, colors, Modifier.weight(1f))
+                        }
+                        repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+                Text(
+                    text = "📊 الإحصائيات",
+                    color = colors.textDim,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(12.dp))
+
+                StatRow("🎮", "جولات", "${prefs.gamesPlayed}", colors)
+                StatRow("🏆", "انتصارات", "${prefs.gamesWon}", colors)
+                StatRow("🔥", "السلسلة الحالية", "${prefs.currentStreak}", colors)
+                StatRow("⭐", "أفضل سلسلة", "${prefs.bestStreak}", colors)
+
+                Spacer(Modifier.height(40.dp))
             }
-
-            Spacer(Modifier.height(20.dp))
-            Text(
-                text = "📊 الإحصائيات",
-                color = colors.textDim,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Spacer(Modifier.height(12.dp))
-
-            StatRow("🎮", "جولات", "${prefs.gamesPlayed}", colors)
-            StatRow("🏆", "انتصارات", "${prefs.gamesWon}", colors)
-            StatRow("🔥", "السلسلة الحالية", "${prefs.currentStreak}", colors)
-            StatRow("⭐", "أفضل سلسلة", "${prefs.bestStreak}", colors)
-
-            Spacer(Modifier.height(40.dp))
         }
     }
 }
@@ -141,7 +161,7 @@ private fun BadgeTile(badge: Badge, unlocked: Boolean, colors: ThemeColors, modi
         Text(
             text = if (hidden) "؟؟؟" else badge.name,
             color = if (unlocked) colors.text else colors.textDim,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
@@ -149,7 +169,7 @@ private fun BadgeTile(badge: Badge, unlocked: Boolean, colors: ThemeColors, modi
         Text(
             text = if (hidden) "اكتشفه بنفسك" else badge.description,
             color = colors.textDim,
-            fontSize = 9.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center,
         )
     }
@@ -194,4 +214,3 @@ fun ScreenHeader(title: String, colors: ThemeColors, onBack: () -> Unit) {
         Text(title, color = colors.text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
     }
 }
-

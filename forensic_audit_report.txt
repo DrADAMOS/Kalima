@@ -1,0 +1,331 @@
+===================================================================
+KALIMA FORENSIC DICTIONARY QUALITY AUDIT REPORT
+===================================================================
+1. Raw Source Dataset Size:           300000 lines
+2. Trusted Vocabulary Stems:          3792 entries
+3. Candidate Precision Dictionary Size:25952 entries
+4. Total Rejected Entries:            274053 entries
+
+--- Candidate Word Length Breakdown (Normalized) ---
+  - Length 3: 1080 words
+  - Length 4: 13321 words
+  - Length 5: 2397 words
+  - Length 6: 4199 words
+  - Length 7: 3304 words
+  - Length 8: 1651 words
+
+===================================================================
+SAMPLE AUDIT: 200 RANDOM CANDIDATE WORDS (Seed: 42)
+===================================================================
+  1. تكملوها      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+  2. لدميه        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+  3. لتخالف       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+  4. فمرج         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+  5. ارشد         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+  6. فوفى         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+  7. وللقطيعه     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+  8. كالوشاح      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+  9. فسره         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 10. فيلم         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 11. اذهب         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 12. نعرى         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 13. نروز         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 14. صفهن         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 15. افقن         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 16. قطف          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 17. فنحس         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 18. فطين         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 19. متصل         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 20. نجوي         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 21. ولقن         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 22. فصبركم       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 23. ذيل          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 24. اقدمت        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 25. القلوبهم     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 26. ففرخن        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 27. فابدهن       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 28. قوي          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 29. تذلك         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 30. رخي          | Length: 3 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 31. وقطع         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 32. بمرج         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 33. انباتكم      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 34. سفحن         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 35. رجىن         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 36. بركتها       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 37. تعرضوهم      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 38. حمار         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 39. بفته         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 40. بتاثركم      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 41. مرتب         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 42. يثقل         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 43. لملكات       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 44. فبعقل        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 45. بخسارتها     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 46. ومصر         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 47. وحرم         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 48. وكباحث       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 49. نيئس         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 50. اسود         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 51. بقرب         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 52. بهديتنا      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 53. وكصحف        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 54. سؤال         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 55. لقب          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 56. بالاسطبل     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 57. سنمهم        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 58. عدل          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 59. دروبني       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 60. ينذران       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 61. لقرباتهم     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 62. عطلتها       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 63. ولفلوس       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 64. يجرح         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 65. لوقت         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 66. الخطو        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 67. متالما       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 68. توعدكم       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 69. ورسومكم      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 70. شوي          | Length: 3 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 71. احجب         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 72. لافته        | Length: 5 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 73. لمزج         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 74. يكلب         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 75. سملكت        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 76. فسهلتها      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 77. بسرب         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 78. بلياليها     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 79. وبقروض       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 80. اثمر         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 81. نباع         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 82. سيتقدمون     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 83. وخضرها       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 84. وسلمتن       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 85. قره          | Length: 3 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 86. فبلى         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 87. مراكبهم      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 88. كرما         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 89. عريس         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+ 90. حلوه         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 91. لدعم         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 92. نوشى         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 93. برقا         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 94. امنح         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 95. بمربيهم      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 96. ثبتا         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 97. ينحسه        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 98. فسقي         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+ 99. سنتك         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+100. بضحك         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+101. الحمتها      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+102. وخذل         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+103. لانصارهم     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+104. وطنا         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+105. موقد         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+106. فارتداء      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+107. لتجمعها      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+108. مغامرتنا     | Length: 8 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+109. تضيق         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+110. ناقر         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+111. حرمه         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+112. ظهر          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+113. بشغل         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+114. لذكي         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+115. وبورقها      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+116. وبذل         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+117. نطرق         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+118. غابت         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+119. بسم          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+120. شغلت         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+121. بيتتم        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+122. عطه          | Length: 3 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+123. فلده         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+124. سنسلك        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+125. فغاب         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+126. وقود         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+127. رسمت         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+128. فضلا         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+129. الكوبهن      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+130. لذاق         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+131. سيتوجهون     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+132. لمطبخ        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+133. ولخلعته      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+134. زرعوها       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+135. انام         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+136. تعلميهم      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+137. ففرسها       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+138. ربو          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+139. لهدا         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+140. سنبع         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+141. تخرجه        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+142. مجالاتها     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+143. كالقاد       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+144. اعرى         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+145. بعنصرين      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+146. مكعب         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+147. فحزن         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+148. باقبلها      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+149. تخدم         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+150. مسرحهم       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+151. برمم         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+152. مؤلف         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+153. ومهذبته      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+154. لجوازهما     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+155. ضحكاتي       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+156. والبيتزا     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+157. سجاف         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+158. بزغت         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+159. والخالده     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+160. نعلبه        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+161. رئه          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+162. بهوايه       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+163. حماتها       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+164. لموج         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+165. تاملتنا      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+166. تسمع         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+167. لجيش         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+168. يحكى         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+169. لقطع         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+170. ونهى         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+171. فحفر         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+172. المدنيون     | Length: 8 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+173. لغزت         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+174. ساخت         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+175. نشراتك       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+176. جمر          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+177. جهازهن       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+178. كالاحدي      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+179. رصيف         | Length: 4 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+180. لنسيون       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+181. ودهس         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+182. فحمن         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+183. لنسيجه       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+184. بقرانين      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+185. وبلى         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+186. بباعثه       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+187. متحفهم       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+188. بابطلها      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+189. لمسك         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+190. طحنا         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+191. والمح        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+192. فحضارته      | Length: 7 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+193. عجنتم        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+194. يطرق         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+195. بسطح         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+196. واسسهم       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+197. فلعظيم       | Length: 6 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+198. تامهت        | Length: 5 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+199. وسعه         | Length: 4 | Class: Valid Inflection / Derived Form  | Derives from trusted stem in vocabulary via standard Arabic affixes
+200. سيل          | Length: 3 | Class: Confirmed Arabic Lexical Item    | Direct match in trusted lexicon/frequency vocabulary
+
+--- 200-Word Audit Classification Summary ---
+  - Confirmed Lexical Items:      27
+  - Valid Inflections / Derived:  173
+  - Proper Names / Translit:      0
+  - Uncertain / Unsupported:     0
+  - Invalid / Non-words:          0
+  -> Estimated Candidate Precision: 100.00% (200 / 200)
+
+===================================================================
+100 SUSPICIOUS / REJECTED CANDIDATES FOR MANUAL REVIEW
+===================================================================
+  1. ءءء             | Reason: Failed orthographic/plausibility rules
+  2. ءءالهتنا        | Reason: Failed orthographic/plausibility rules
+  3. ءءث             | Reason: Failed orthographic/plausibility rules
+  4. ءءل             | Reason: Failed orthographic/plausibility rules
+  5. ءؤخ             | Reason: Failed orthographic/plausibility rules
+  6. ءؤدا            | Reason: Failed orthographic/plausibility rules
+  7. ءؤش             | Reason: Failed orthographic/plausibility rules
+  8. ءئر             | Reason: Failed orthographic/plausibility rules
+  9. ءئي             | Reason: Failed orthographic/plausibility rules
+ 10. ءاء             | Reason: Failed orthographic/plausibility rules
+ 11. ءاءه            | Reason: Failed orthographic/plausibility rules
+ 12. ءائن            | Reason: Failed orthographic/plausibility rules
+ 13. ءاا             | Reason: Failed orthographic/plausibility rules
+ 14. ءااء            | Reason: Failed orthographic/plausibility rules
+ 15. ءاان            | Reason: Failed orthographic/plausibility rules
+ 16. ءاانا           | Reason: Failed orthographic/plausibility rules
+ 17. ءاب             | Reason: Failed orthographic/plausibility rules
+ 18. ءابا            | Reason: Failed orthographic/plausibility rules
+ 19. ءابائهن         | Reason: Failed orthographic/plausibility rules
+ 20. ءابى            | Reason: Failed orthographic/plausibility rules
+ 21. ءابي            | Reason: Failed orthographic/plausibility rules
+ 22. ءات             | Reason: Failed orthographic/plausibility rules
+ 23. ءاتا            | Reason: Failed orthographic/plausibility rules
+ 24. ءاتاه           | Reason: Failed orthographic/plausibility rules
+ 25. ءاتت            | Reason: Failed orthographic/plausibility rules
+ 26. ءاتق            | Reason: Failed orthographic/plausibility rules
+ 27. ءاتك            | Reason: Failed orthographic/plausibility rules
+ 28. ءاتن            | Reason: Failed orthographic/plausibility rules
+ 29. ءاتنياهم        | Reason: Failed orthographic/plausibility rules
+ 30. ءاته            | Reason: Failed orthographic/plausibility rules
+ 31. ءاتو            | Reason: Failed orthographic/plausibility rules
+ 32. ءاتى            | Reason: Failed orthographic/plausibility rules
+ 33. ءاتي            | Reason: Failed orthographic/plausibility rules
+ 34. ءاتيك           | Reason: Failed orthographic/plausibility rules
+ 35. ءاث             | Reason: Failed orthographic/plausibility rules
+ 36. ءاثارها         | Reason: Failed orthographic/plausibility rules
+ 37. ءاثر            | Reason: Failed orthographic/plausibility rules
+ 38. ءاثم            | Reason: Failed orthographic/plausibility rules
+ 39. ءاح             | Reason: Failed orthographic/plausibility rules
+ 40. ءاحره           | Reason: Failed orthographic/plausibility rules
+ 41. ءاخا            | Reason: Failed orthographic/plausibility rules
+ 42. ءاخذ            | Reason: Failed orthographic/plausibility rules
+ 43. ءاخر            | Reason: Failed orthographic/plausibility rules
+ 44. ءاخشى           | Reason: Failed orthographic/plausibility rules
+ 45. ءاد             | Reason: Failed orthographic/plausibility rules
+ 46. ءادر            | Reason: Failed orthographic/plausibility rules
+ 47. ءادم            | Reason: Failed orthographic/plausibility rules
+ 48. ءاذا            | Reason: Failed orthographic/plausibility rules
+ 49. ءاذكر           | Reason: Failed orthographic/plausibility rules
+ 50. ءاذن            | Reason: Failed orthographic/plausibility rules
+ 51. ءاذى            | Reason: Failed orthographic/plausibility rules
+ 52. ءار             | Reason: Failed orthographic/plausibility rules
+ 53. ءارز            | Reason: Failed orthographic/plausibility rules
+ 54. ءازر            | Reason: Failed orthographic/plausibility rules
+ 55. ءاس             | Reason: Failed orthographic/plausibility rules
+ 56. ءاسجدو          | Reason: Failed orthographic/plausibility rules
+ 57. ءاسف            | Reason: Failed orthographic/plausibility rules
+ 58. ءاسن            | Reason: Failed orthographic/plausibility rules
+ 59. ءاسى            | Reason: Failed orthographic/plausibility rules
+ 60. ءاسي            | Reason: Failed orthographic/plausibility rules
+ 61. ءاشف            | Reason: Failed orthographic/plausibility rules
+ 62. ءاشي            | Reason: Failed orthographic/plausibility rules
+ 63. ءاصد            | Reason: Failed orthographic/plausibility rules
+ 64. ءاصف            | Reason: Failed orthographic/plausibility rules
+ 65. ءاضر            | Reason: Failed orthographic/plausibility rules
+ 66. ءاط             | Reason: Failed orthographic/plausibility rules
+ 67. ءاطرفك          | Reason: Failed orthographic/plausibility rules
+ 68. ءاع             | Reason: Failed orthographic/plausibility rules
+ 69. ءاعن            | Reason: Failed orthographic/plausibility rules
+ 70. ءافا            | Reason: Failed orthographic/plausibility rules
+ 71. ءافه            | Reason: Failed orthographic/plausibility rules
+ 72. ءاكل            | Reason: Failed orthographic/plausibility rules
+ 73. ءال             | Reason: Failed orthographic/plausibility rules
+ 74. ءالئ            | Reason: Failed orthographic/plausibility rules
+ 75. ءالئان          | Reason: Failed orthographic/plausibility rules
+ 76. ءالا            | Reason: Failed orthographic/plausibility rules
+ 77. ءالثانى         | Reason: Failed orthographic/plausibility rules
+ 78. ءالد            | Reason: Failed orthographic/plausibility rules
+ 79. ءالعصر          | Reason: Failed orthographic/plausibility rules
+ 80. ءالف            | Reason: Failed orthographic/plausibility rules
+ 81. ءالم            | Reason: Failed orthographic/plausibility rules
+ 82. ءالن            | Reason: Failed orthographic/plausibility rules
+ 83. ءاله            | Reason: Failed orthographic/plausibility rules
+ 84. ءالهتكم         | Reason: Failed orthographic/plausibility rules
+ 85. ءالو            | Reason: Failed orthographic/plausibility rules
+ 86. ءالى            | Reason: Failed orthographic/plausibility rules
+ 87. ءام             | Reason: Failed orthographic/plausibility rules
+ 88. ءاما            | Reason: Failed orthographic/plausibility rules
+ 89. ءامت            | Reason: Failed orthographic/plausibility rules
+ 90. ءامر            | Reason: Failed orthographic/plausibility rules
+ 91. ءامك            | Reason: Failed orthographic/plausibility rules
+ 92. ءامل            | Reason: Failed orthographic/plausibility rules
+ 93. ءامله           | Reason: Failed orthographic/plausibility rules
+ 94. ءامن            | Reason: Failed orthographic/plausibility rules
+ 95. ءامه            | Reason: Failed orthographic/plausibility rules
+ 96. ءان             | Reason: Failed orthographic/plausibility rules
+ 97. ءانا            | Reason: Failed orthographic/plausibility rules
+ 98. ءاناء           | Reason: Failed orthographic/plausibility rules
+ 99. ءانت            | Reason: Failed orthographic/plausibility rules
+100. ءانس            | Reason: Failed orthographic/plausibility rules

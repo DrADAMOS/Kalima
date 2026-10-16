@@ -77,6 +77,109 @@ class GameStateTest {
     }
 
     @Test
+    fun backspaceDeletesTypedLettersButPreservesHintedCells() {
+        val game = GameState(GameMode.RANDOM, 4, "سلام", hintCount = 1)
+        assertTrue(game.useHint())
+        game.addLetter("ق")
+        game.addLetter("ل")
+        assertEquals(3, game.currentRowLetters().length)
+        game.removeLetter()
+        game.removeLetter()
+        assertEquals("س", game.currentRowLetters())
+        assertEquals(setOf("س"), game.hintRevealedLetters())
+    }
+
+    @Test
+    fun typedLettersAreNotReportedAsHintRevealed() {
+        val game = GameState(GameMode.RANDOM, 4, "سلام", hintCount = 1)
+        game.addLetter("ق")
+        game.addLetter("ل")
+        assertTrue(game.hintRevealedLetters().isEmpty())
+    }
+
+    // --- Focused Backspace Regression Tests ---
+
+    @Test
+    fun testHintedCellBeforeTypedLetters() {
+        val game = GameState(GameMode.RANDOM, 4, "كتاب", hintCount = 1)
+        assertTrue(game.useHint()) // index 0 is 'ك'
+        game.addLetter("ت")
+        game.addLetter("ا")
+        game.addLetter("ب")
+        assertEquals("كتاب", game.currentRowLetters())
+        game.removeLetter()
+        game.removeLetter()
+        game.removeLetter()
+        game.removeLetter() // should not delete hinted index 0
+        assertEquals("ك", game.cellAt(0, 0).letter)
+        assertTrue(game.cellAt(0, 1).letter.isEmpty())
+        assertTrue(game.cellAt(0, 2).letter.isEmpty())
+        assertTrue(game.cellAt(0, 3).letter.isEmpty())
+    }
+
+    @Test
+    fun testHintedCellBetweenTypedLetters() {
+        val game = GameState(GameMode.RANDOM, 4, "قلمي", hintCount = 1)
+        game.addLetter("ق") // index 0
+        assertTrue(game.useHint()) // index 1 is 'ل'
+        game.addLetter("م") // index 2
+        game.addLetter("ي") // index 3
+        assertEquals("قلمي", game.currentRowLetters())
+
+        game.removeLetter() // index 3
+        game.removeLetter() // index 2
+        game.removeLetter() // skips hinted index 1, removes index 0
+        assertEquals("ل", game.cellAt(0, 1).letter)
+        assertTrue(game.cellAt(0, 0).letter.isEmpty())
+        assertTrue(game.cellAt(0, 2).letter.isEmpty())
+        assertTrue(game.cellAt(0, 3).letter.isEmpty())
+    }
+
+    @Test
+    fun testMultipleHintedCellsAndConsecutiveBackspaces() {
+        val game = GameState(GameMode.RANDOM, 4, "سلام", hintCount = 2)
+        assertTrue(game.useHint()) // index 0 ('س')
+        game.addLetter("ق")       // index 1
+        assertTrue(game.useHint()) // index 2 ('ا')
+        game.addLetter("م")       // index 3
+        
+        game.removeLetter() // removes index 3 ('م')
+        game.removeLetter() // skips hinted index 2 ('ا'), removes index 1 ('ق')
+        
+        // Hinted cells at index 0 ('س') and index 2 ('ا') must remain intact
+        assertEquals("س", game.cellAt(0, 0).letter)
+        assertEquals("ا", game.cellAt(0, 2).letter)
+        assertTrue(game.cellAt(0, 1).letter.isEmpty())
+        assertTrue(game.cellAt(0, 3).letter.isEmpty())
+
+        // Subsequent addLetter should fill next available unhinted cell (index 1)
+        game.addLetter("ل")
+        assertEquals("ل", game.cellAt(0, 1).letter)
+    }
+
+    @Test
+    fun testBackspaceWhenEveryEarlierCellIsHinted() {
+        val game = GameState(GameMode.RANDOM, 3, "بحر", hintCount = 3)
+        assertTrue(game.useHint()) // index 0 ('ب')
+        assertTrue(game.useHint()) // index 1 ('ح')
+        assertTrue(game.useHint()) // index 2 ('ر')
+        
+        val beforeLetters = game.currentRowLetters()
+        assertEquals("بحر", beforeLetters)
+        game.addLetter("ل")
+        assertEquals("بحر", game.currentRowLetters()) // unchanged because row is full of hints
+
+        game.removeLetter()
+        game.removeLetter()
+        game.removeLetter()
+        
+        // All three hinted cells must remain intact
+        assertEquals("ب", game.cellAt(0, 0).letter)
+        assertEquals("ح", game.cellAt(0, 1).letter)
+        assertEquals("ر", game.cellAt(0, 2).letter)
+    }
+
+    @Test
     fun testHardModeBlocksBrokenGreen() {
         // target: "بيت"
         val game = GameState(GameMode.RANDOM, 3, "بيت", hardMode = true)
@@ -131,5 +234,34 @@ class GameStateTest {
         assertTrue(game.isGameOver)
         val letters = game.currentRowLetters()
         assertEquals("", letters)
+    }
+    @Test
+    fun hintCanRevealRepeatedLettersInSameRow() {
+        val game = GameState(GameMode.RANDOM, 5, "ممرات", hintCount = 2)
+        assertTrue(game.useHint())
+        assertTrue(game.useHint())
+        assertEquals("م", game.cellAt(0, 0).letter)
+        assertEquals("م", game.cellAt(0, 1).letter)
+        assertEquals(0, game.hintCount)
+        assertFalse(game.useHint())
+    }
+
+    @Test
+    fun hintDoesNotRevealLetterBeyondItsCountInTarget() {
+        val game = GameState(GameMode.RANDOM, 3, "باب", hintCount = 3)
+        game.addLetter("ب")
+        game.addLetter("ب")
+        // الخانتان 0 و1 ممتلئتان، و«ب» ظهرت مرتين وهذا عددها في الهدف: لا تلميح متاح
+        assertFalse(game.useHint())
+        assertEquals(3, game.hintCount)
+    }
+
+    @Test
+    fun safeModeRejectsBlockedWordButNormalModeDoesNot() {
+        val safe = GameState(GameMode.RANDOM, 3, "باب", safeMode = true)
+        assertEquals(SubmitResult.BlockedWord, safe.submitGuess("خمر"))
+
+        val normal = GameState(GameMode.RANDOM, 3, "باب", safeMode = false)
+        assertTrue(normal.submitGuess("خمر") != SubmitResult.BlockedWord)
     }
 }

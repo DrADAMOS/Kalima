@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +36,8 @@ import com.adamos.kalima.ui.theme.ThemeManager
 fun LeaderboardScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { Preferences(context) }
-    val colors: ThemeColors = ThemeManager.of(prefs.gameTheme)
+    val currentTheme by prefs.themeState.collectAsState(initial = prefs.gameTheme)
+    val colors: ThemeColors = ThemeManager.of(currentTheme)
 
     Column(
         modifier = Modifier
